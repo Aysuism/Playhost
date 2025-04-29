@@ -9,6 +9,7 @@ import { FaTimes } from "react-icons/fa";
 import { RiMenuFill } from "react-icons/ri";
 import { useGetSettingsQuery } from '../dashboard/tools/api/settings';
 import Loader from '../preloader/Loader';
+import Swal from 'sweetalert2';
 
 const Header = ({ togglePanel }) => {
     const navigate = useNavigate();
@@ -28,8 +29,8 @@ const Header = ({ togglePanel }) => {
     // ------------------------------- Cart -----------------
     const { totalItems } = useCart();
 
-    // ------------------------------- Genral Seting Logo -----------------
-    const { data: settings, isLoading, isError } = useGetSettingsQuery()
+    // ------------------------------- General Setting Logo -----------------
+    const { data: settings, isLoading, isError } = useGetSettingsQuery();
 
     // ------------------------------- Mobile Menu -----------------
     const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -70,7 +71,7 @@ const Header = ({ togglePanel }) => {
             return false;
         }
         return true;
-    }
+    };
 
     const [loggedInUser, setLoggedInUser] = useState(null);
 
@@ -90,7 +91,7 @@ const Header = ({ togglePanel }) => {
         window.location.reload();
     };
 
-    if (isLoading) return <Loader/>;
+    if (isLoading) return <Loader />;
     if (isError) return <div>Error loading settings</div>;
     if (!settings) return <div>No settings found</div>;
 
@@ -100,9 +101,10 @@ const Header = ({ togglePanel }) => {
             <div className={`mobile-menu-overlay ${showMobileMenu ? 'show' : ''}`} onClick={toggleMobileMenu} />
 
             <nav className="navbar navbar-expand">
-                {settings.map((item) => (
-                    <Link key={item._id} className='navbar-brand'><img src={`https://playhost-backend.onrender.com/${item.logo}`} alt="Logo" /></Link>
-                ))}
+                <Link key={settings._id || Math.random()} className='navbar-brand' to="/">
+                    <img src={`https://playhost-backend.onrender.com/${settings[0].logo}`} alt="Logo" />
+                </Link>
+
                 {/* Mobile Menu Close Button (shown only when menu is open) */}
                 {showMobileMenu && (
                     <button className="mobile-menu-close" onClick={toggleMobileMenu}>
@@ -168,17 +170,16 @@ const Header = ({ togglePanel }) => {
                         <FaCartShopping className='cart' />({totalItems})
                     </button>
 
-                    <Link 
-                        to={'/wishlist'} 
-                        onClick={(e) => {
-                            if (!checkUser()) {
-                                e.preventDefault();
-                            }
-                        }} 
+                    <button
                         className='btn heart-btn'
+                        onClick={() => {
+                            if (checkUser()) {
+                                navigate('/wishlist');
+                            }
+                        }}
                     >
                         <FaHeart className='heart' />
-                    </Link>
+                    </button>
 
                     {loggedInUser ? (
                         <div className="dropdown">
@@ -201,7 +202,7 @@ const Header = ({ togglePanel }) => {
 
                 {/* Mobile Menu Toggle Button */}
                 <button className="navbar-toggler" type="button" onClick={toggleMobileMenu} aria-label="Toggle navigation" > <RiMenuFill /> </button>
-
+           
             </nav>
         </header>
     );
