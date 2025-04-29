@@ -1,0 +1,15 @@
+.light{
+    --bg-color:#ffffff;
+    --p-color:#92939E;
+    --Kcolor: #000;
+    --bg-img:url('../../../../public/bg-pirate-ship.jpg');
+    --sign-in-out-bg:url('../../../../public/auth-light-bg.jpg');
+}
+
+.dark{
+    --bg-color:#010314;
+    --p-color:#fff;
+    --Kcolor:#fff;
+    --bg-img:url('../../../../public/spiderman.png');
+    --sign-in-out-bg:url('../../../../public/auth-dark-bg.jpg');
+}

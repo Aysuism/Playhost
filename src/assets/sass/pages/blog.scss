@@ -1,0 +1,25 @@
+.blog {
+    .hero {
+        @include hero;
+        background-image: url('https://madebydesignesia.com/themes/playhost/images/background/subheader-news.webp');
+    }
+    .news-section{
+        @include section(true);
+        .news{
+            text-decoration: none;
+            img{
+                width: 100%;
+                border-radius: 10px;
+            }
+            h4{
+                color: var(--Kcolor);
+                margin-top: 20px;
+            }
+
+            p{
+                color: $color-gray;
+            }
+        }
+    }
+
+}

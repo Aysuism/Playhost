@@ -1,0 +1,351 @@
+.product-details {
+    .loading {
+        img {
+            width: 100%;
+            height: 70vh;
+            object-fit: contain;
+        }
+    }
+
+    .server-hosting {
+        background-image: linear-gradient(0deg, var(--bg-color) 0%, rgb(63, 59, 59, 0) 70%),
+            url('https://madebydesignesia.com/themes/playhost/images/background/subheader-game-2.webp');
+        @include section(true);
+
+
+
+        img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .text {
+            .stars {
+                display: flex;
+                align-items: center;
+                gap: 3px;
+                padding-bottom: 10px;
+
+                .star {
+                    color: gold;
+                    font-size: 1.2rem;
+                }
+
+                .scoree {
+                    color: #fff;
+                    font-weight: 700;
+                    margin-left: 5px;
+                }
+            }
+        }
+    }
+
+    .configurations {
+
+        background-color: var(--bg-color);
+
+        h3 {
+            color: var(--Kcolor);
+            padding-bottom: 5px;
+        }
+
+        p {
+            color: $color-gray;
+            padding-bottom: 50px;
+        }
+
+        .slots {
+            height: 50vh;
+            @include section;
+            @include d-flex;
+            align-items: start;
+
+            .rc-slider-track {
+                background-color: $purple;
+            }
+
+            .rc-slider-handle {
+                background-color: $purple;
+                border: none;
+            }
+
+            span {
+                color: var(--Kcolor);
+                font-size: 15px;
+            }
+
+            .rc-slider-dot-active {
+                border: none;
+                background-color: $purple;
+
+            }
+
+        }
+
+        .duration {
+            @include section;
+
+            p {
+                color: $color-gray;
+                padding-bottom: 50px;
+            }
+
+            .duration-menu {
+                .duration-item {
+                    width: 100%;
+                    background-color: var(--bg-color);
+                    color: var(--Kcolor);
+                    border: 2px solid $color-gray;
+                    padding: 20px 0;
+                    border-radius: 10px;
+                }
+
+                .active {
+                    background-color: $purple;
+                    border-color: $purple;
+                    color: #fff;
+                }
+            }
+        }
+
+        .locations {
+            @include section;
+
+            .location-menu {
+
+                .location-item {
+                    width: 100%;
+                    height: 120px;
+                    padding: 10px 0;
+                    border: 1px solid #ddd;
+                    border-radius: 10px;
+                    background: var(--bg-color);
+                    color: var(--Kcolor);
+                    @include d-flex;
+
+                }
+
+                .active {
+                    background: $purple;
+                    color: #fff;
+                    border-color: $purple;
+                }
+            }
+
+        }
+
+        .add-cart-btn {
+            margin: 7rem 0;
+            padding: 0.75rem 2rem;
+            background: $purple;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background: darken($purple, 10%);
+            }
+        }
+    }
+
+    .comment-section {
+        @include section;
+
+        .add-button {
+            @include purple-outline-btn;
+            color: var(--Kcolor);
+            margin: 0;
+        }
+
+        .modal {
+            &-header {
+                background-color: $purple;
+
+                .modal-title {
+                    @include h1;
+                    font-size: 2rem;
+                    padding: 0;
+                }
+
+
+
+                .btn-close {
+                    &-white {
+                        filter: invert(1);
+                    }
+                }
+            }
+        }
+
+        .form-container {
+            background-color: rgba(224, 219, 255, 0.5);
+
+            .row {
+                margin-bottom: 1rem;
+            }
+
+            .form-label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-weight: 700;
+                color: $purple;
+            }
+
+            .form-control {
+                font-weight: bold;
+                padding: 0.5rem 0.75rem;
+                border-radius: 0.25rem;
+                transition: all .3s ease;
+
+                &:focus {
+                    border-color: $purple;
+                    outline: 0;
+                    box-shadow: 0 0 0 0.2rem rgba($purple, 0.25);
+                }
+            }
+
+            .btn {
+                @include purple-outline-btn;
+                color: $purple;
+
+                &-primary {
+
+                    &:hover {
+                        background-color: darken($purple, 10%);
+                        border-color: darken($purple, 10%);
+                    }
+
+                    &:disabled {
+                        opacity: 0.65;
+                        cursor: not-allowed;
+                    }
+                }
+
+                &-secondary {
+                    color: #fff;
+                    background-color: #6c757d98;
+                    border: none;
+
+                    &:hover {
+                        background-color: #000;
+                        border-color: #545b62;
+                    }
+                }
+            }
+
+        }
+
+        .dashboard-container {
+
+            .dashboard-grid {
+                display: grid;
+                gap: 25px;
+
+                .dashboard-card {
+                    background: var(--bg-color);
+                    border-radius: 10px;
+                    border: 2px solid var(--Kcolor);
+                    padding: 20px;
+
+                    img {
+                        width: 100px;
+                        height: 100px;
+                        object-fit: cover;
+                        margin-top: 20px
+                    }
+
+                    .dashboard-content {
+                        .dashboard-description {
+                            padding-left: 20px;
+
+                            .dashboard-heading {
+                                @include h1;
+                                margin-bottom: 15px;
+                                font-size: 2rem;
+
+                            }
+
+                            p{
+                                font-weight: 700;
+                                font-size: 20px;
+                            }
+                        }
+
+                        .rating {
+                            span {
+                                color: var(--Kcolor);
+                            }
+                        }
+
+                    }
+
+                    .dashboard-actions {
+                        display: flex;
+                        gap: 10px;
+                        padding: 20px 0;
+
+                        .btn {
+                            padding: 8px 16px;
+                            border: 1px solid;
+                            border-radius: 6px;
+                            font-weight: 700;
+                            cursor: pointer;
+                            text-align: center;
+                            transition: all 0.2s ease;
+
+                            &-edit {
+                                background-color: #fff;
+                                color: $purple;
+
+                                &:hover {
+                                    background-color: $bg-color;
+                                    transform: translateY(-2px);
+                                    color: #fff;
+                                }
+                            }
+
+                            &-delete {
+                                background-color: #fff;
+                                color: red;
+
+                                &:hover {
+                                    background-color: red;
+                                    color: #fff;
+                                    transform: translateY(-2px);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            .no-comment-yet{
+                background-color: $purple;
+                .btn{
+                    @include purple-outline-btn;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .dashboard-grid {
+                    grid-template-columns: 1fr;
+                    padding: 0;
+                }
+            }
+        }
+    }
+
+    @media (max-width:500px) {
+
+        .configurations {
+            .slots {
+                span {
+                    font-size: 10px;
+                }
+            }
+        }
+    }
+}

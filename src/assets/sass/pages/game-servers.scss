@@ -1,0 +1,309 @@
+.game-servers {
+    background-image: var(--bg-img);
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: right;
+    padding-top: 70px;
+
+
+
+    .hero {
+        height: 45vh;
+        @include section(true);
+        @include d-flex;
+        background-color: transparent;
+        text-align: center;
+
+        form {
+            background-color: rgba(36, 36, 36, 0.5);
+            border: 1px solid rgb(73, 71, 71);
+            border-radius: 23px;
+            padding: 0 10px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+
+            input {
+                border: none;
+                background-color: transparent;
+                color: #fff;
+
+                &::placeholder {
+                    color: rgb(181, 181, 181);
+                }
+
+                &:focus {
+                    box-shadow: none;
+                }
+            }
+
+            .magnifying-glass {
+                color: #fff;
+                margin-right: 10px;
+            }
+
+            &:focus {
+                -webkit-box-shadow: 0px 0px 33px 0px rgba(255, 255, 255, 0.75);
+                -moz-box-shadow: 0px 0px 33px 0px rgba(255, 255, 255, 0.75);
+                box-shadow: 0px 0px 33px 0px rgba(255, 255, 255, 0.75);
+
+            }
+        }
+    }
+
+    .category-btn {
+        @include section(true);
+        @include d-flex;
+        background-color: transparent;
+        padding-top: 30px;
+        border-top: 1px solid;
+        text-align: center;
+
+        .dropdown {
+            position: relative; // Needed for absolute positioning of dropdown
+
+            .dropdown-toggle {
+                border: none;
+                background: transparent;
+                color: #fff;
+                font-weight: 600;
+                cursor: pointer;
+                padding: 8px 12px;
+            }
+
+            .dropdown-menu {
+                position: absolute;
+                left: 0;
+                top: 100%;
+                background-color: $bg-color;
+                min-width: 200px;
+                padding: 10px 0;
+                border: none;
+                border-radius: 4px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                z-index: 1000;
+                display: none;
+
+                &.show {
+                    display: block;
+                }
+
+                .dropdown-item {
+                    color: #fff;
+                    transition: all 0.3s ease;
+                    padding: 8px 20px;
+                    display: block;
+                    text-decoration: none;
+
+                    &:hover {
+                        background-color: transparent;
+                        text-shadow: 0 0 5px $purple, 0 0 10px $purple;
+                    }
+                }
+            }
+
+            &:hover .dropdown-menu {
+                display: block;
+            }
+
+            .active {
+                background-color: $purple;
+            }
+        }
+
+        .btn {
+            @include purple-btn($background-color: rgb(255 255 255 / 10%));
+            margin: 10px;
+            text-shadow: 0 0 5px $purple, 0 0 10px $purple, 0 0 15px $purple, 0 0 20px $purple, 0 0 30px $purple, 0 0 40px $purple, 0 0 55px $purple, 0 0 75px $purple, 0 0 2px $purple;
+
+            &:hover {
+                @include purple-btn;
+                box-shadow: 0 0 40px 0px rgb(86 35 216)
+            }
+        }
+
+        .btn-active {
+            @include purple-btn;
+        }
+
+        .selected {
+            @include purple-btn;
+            box-shadow: 0 0 40px 0px rgb(86 35 216);
+            &:focus{
+
+            }
+            
+        }
+    }
+
+    .products {
+        padding: 30px;
+
+        .box {
+            height: 340px;
+            position: relative;
+            outline: 5px solid transparent;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all .5s ease;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .discount-tag {
+                position: absolute;
+                top: 0;
+                left: 0;
+                margin: 20px;
+                padding: 7px 12px;
+                background-color: #E615AF;
+                color: #fff;
+                font-size: 14px;
+                font-weight: 800;
+                font-family: $font-Manrope;
+                border-radius: 6px;
+            }
+            
+            .btn{
+                @include d-flex;
+            }
+
+            .wishlist-btn {
+                position: absolute;
+                top: 0;
+                right: 0;
+                margin: 20px;
+                background-color: transparent;
+                font-size: 30px;
+                border: none;
+                color: #fff;
+                transition: all .3s ease;
+
+                &:hover {
+                    transform: scale(1.5);
+                }
+            }
+
+            .info {
+                position: absolute;
+                bottom: -90px;
+                width: 100%;
+                background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+                color: $color-white;
+                padding: 30px;
+                transition: all .5s ease;
+
+                h4 {
+                    @include h1;
+                    background: linear-gradient(to top, #a5a5ab, #fff);
+                    background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    font-size: 32px;
+                    border-bottom: 1px solid rgb(255 255 255 / 50%);
+                    padding-bottom: 10px;
+                }
+
+                .stars {
+                    display: flex;
+                    align-items: center;
+                    margin: 5px 0;
+
+                    .star {
+                        font-size: 16px;
+                        margin-right: 2px;
+
+                        &.filled {
+                            color: #ffc107; // Yellow for filled stars
+                        }
+
+                        &.empty {
+                            color: #e4e5e9; // Light gray for empty stars
+                        }
+                    }
+
+                    .star-container {
+                        position: relative;
+                        display: inline-block;
+                        width: 16px;
+                        height: 16px;
+
+                        .star {
+                            position: absolute;
+                            left: 0;
+                            top: 0;
+
+                            &.half-filled {
+                                width: 50%;
+                                overflow: hidden;
+                                color: #ffc107; // Yellow for half-filled part
+                            }
+                        }
+                    }
+
+                    .score {
+                        margin: 5px;
+                        font-size: 16px;
+                        padding-top: 5px;
+                    }
+                }
+
+                p {
+                    color: $color-gray;
+                    float: left;
+                }
+
+                .price {
+                    padding: 5px 10px;
+                    background-color: #6a1fb6;
+                    border-radius: 5px;
+                    color: white;
+                    font-weight: bold;
+                    margin-left: 30px;
+
+                    .original-price {
+                        color: $color-gray;
+                        text-decoration: line-through;
+                        margin-right: 10px;
+                    }
+                }
+
+                .buttons {
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-evenly;
+                    gap: 20px;
+                    padding-top: 20px;
+
+                    .add-cart-btn {
+                        @include purple-btn;
+                    }
+
+                    .read-more-btn {
+                        width: 50%;
+                        @include purple-btn;
+                        text-decoration: none;
+                        text-align: center;
+                    }
+
+                    .btn {
+                        padding: 7px 14px;
+                        margin: 0;
+                    }
+                }
+            }
+
+            &:hover {
+                outline-color: $purple;
+                box-shadow: 0 0 20px 20px rgba(0, 0, 0, 0.7);
+
+                .info {
+                    bottom: 0;
+                }
+            }
+        }
+
+    }
+}

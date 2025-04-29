@@ -1,0 +1,35 @@
+.not-found-page {
+    background-image: url('https://animeheaven.soulknightweb.com/images/banner/404.jpg');
+    @include hero;
+    background-position: top;
+    height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .text {
+        text-align: center;
+        img {
+            width: 60%;
+        }
+
+        h3 {
+            color: #FFFFFF;
+            text-shadow: red 0px 0px 5px, red 0px 0px 5px, #FFF 0px 0px 15px, #FF2D95 0px 0px 20px, #FF2D95 0px 0px 30px, #FF2D95 0px 0px 40px, #FF2D95 0px 0px 50px, #FF2D95 0px 0px 75px;
+            color: red;
+            padding: 10px 0;
+        }
+
+        p{
+            font-weight: 500;
+            color: #fff;
+            padding: 20px 0
+        }
+        .back-home{
+            @include purple-btn;
+            text-decoration: none;
+            font-size: 20px;
+            padding: 15px;
+        }
+    }
+}

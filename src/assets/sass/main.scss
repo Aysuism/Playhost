@@ -1,0 +1,54 @@
+//-----------------------ABSTRACTS------------------
+@import './abstracts/variables';
+@import './abstracts/mixin';
+@import './abstracts/theme';
+
+
+//-----------------------LAYOUTS------------------
+@import './layout/header.scss';
+@import './layout/footer.scss';
+
+
+//-----------------------PAGES------------------
+@import './pages/home.scss';
+@import './pages/game-servers.scss';
+@import './pages/about.scss';
+@import './pages/blog.scss';
+@import './pages/contact.scss';
+@import './pages/faq.scss';
+
+@import './pages/basket.scss';
+@import './pages/wishlist.scss';
+@import './pages/product-details.scss';
+@import './pages/blog-details.scss';
+@import './pages/checkout.scss';
+
+
+@import './pages/not-found-page.scss';
+
+//-----------------------DASHBOARD----------------
+@import './dashboard/dashboard.scss';
+@import './dashboard/home-management.scss';
+@import './dashboard/about-management.scss';
+@import './dashboard/games-management.scss';
+@import './dashboard/footer-management.scss';
+
+//-----------------------Login/Register----------------
+@import './auth/auth.scss';
+@import './auth/admin-login.scss';
+
+*,
+body {
+    font-family: $font-Oxanium;
+    box-sizing: border-box;
+
+    .loader {
+        height: 100vh;
+        background-color: $bg-color;
+        @include d-flex;
+    }
+
+    p {
+        font-family: $font-Manrope;
+    }
+}

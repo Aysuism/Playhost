@@ -1,0 +1,134 @@
+.about {
+    .hero {
+        @include hero;
+        background-image: url('https://madebydesignesia.com/themes/playhost/images/background/subheader-about.webp');
+
+        .text {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+    }
+
+    .we-are-playhost {
+        @include section(true);
+        padding: 70px 20px;
+
+        .left-img {
+            .back-img {
+                width: 100%;
+                object-fit: contain;
+            }
+        }
+
+        .text {
+            span {
+                color: var(--Kcolor);
+                border-color: $color-gray;
+                padding: 10px 20px;
+            }
+
+            .experience {
+                display: flex;
+                align-items: center;
+
+                h1 {
+                    font-size: clamp(8rem, 8vw, 8.75rem);
+                    font-weight: 500;
+                }
+
+                ul {
+                    list-style: none;
+
+                    li {
+                        padding-bottom: 15px;
+                        color: var(--Kcolor);
+                        font-size: 18px;
+                    }
+                }
+            }
+
+            p {
+                color: $color-gray;
+            }
+        }
+
+        .vision-mission {
+            h4 {
+                color: var(--Kcolor);
+            }
+
+            p {
+                color: $color-gray;
+            }
+        }
+    }
+
+    .our-solid-team {
+        @include section(true);
+
+        .profile {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+
+            img {
+                width: 100%;
+                border-radius: 30px;
+            }
+
+            h4 {
+                color: var(--Kcolor);
+                padding-top: 20px;
+            }
+
+            p {
+                color: $color-gray;
+            }
+        }
+    }
+
+    .customer-reviews {
+        @include section;
+
+        .comment-box {
+            background-color: #0F101E;
+            height: 400px;
+            padding: 30px;
+            border-radius: 30px;
+            @include d-flex;
+            align-items: start;
+            gap: 30px;
+        }
+    }
+
+    .accomplishments {
+        background-color: var(--bg-color);
+        display: flex;
+        align-items: center;
+        text-align: center;
+        font-family: $font-Oxanium;
+        padding: 100px 0;
+
+        .num-box {
+            height: 130px;
+
+            h3 {
+                font-size: 72px;
+                font-weight: bold;
+                color: $purple;
+            }
+
+            h4 {
+                color: var(--Kcolor);
+                font-weight: bold;
+            }
+
+            .border-num {
+                color: transparent;
+                -webkit-text-stroke: 1px var(--Kcolor);
+            }
+        }
+    }
+}
