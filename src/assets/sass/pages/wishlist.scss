@@ -1,7 +1,7 @@
 .wishlist {
     .hero {
         @include hero;
-        background-image: url(../../../../public/wishlist-bg-warrior-girl.jpg);
+        background-image: url(/wishlist-bg-warrior-girl.jpg);
         height: 60vh;
 
         p {
