@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { LangContext } from '../context/LangContext';
 import { ThemeContext } from '../context/ThemeContext';
 import { useCart } from 'react-use-cart';
@@ -11,6 +11,7 @@ import { useGetSettingsQuery } from '../dashboard/tools/api/settings';
 import Loader from '../preloader/Loader';
 
 const Header = ({ togglePanel }) => {
+    const navigate = useNavigate();
 
     // ------------------------------- Language Change -----------------
     const { lang, setLang } = useContext(LangContext);
@@ -56,18 +57,19 @@ const Header = ({ togglePanel }) => {
         if (!user) {
             Swal.fire({
                 title: lang === "AZ" ? "Daxil olmağınız tələb edilir" : "Login Required",
-                text: lang === "AZ" ? "İstək siyahısına əlavə etmək üçün daxil olun" : "Please login to add to wishlist",
+                text: lang === "AZ" ? "İstək siyahısına giris üçün üçün daxil olun" : "Please login to get access to wishlist",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonText: lang === "AZ" ? "Daxil ol" : "Login",
                 cancelButtonText: lang === "AZ" ? "Ləğv et" : "Cancel"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '/auth/login';
+                    navigate('/auth/login');
                 }
             });
-            return;
+            return false;
         }
+        return true;
     }
 
     const [loggedInUser, setLoggedInUser] = useState(null);
@@ -87,9 +89,6 @@ const Header = ({ togglePanel }) => {
         setLoggedInUser(null);
         window.location.reload();
     };
-
-
-
 
     if (isLoading) return <Loader/>;
     if (isError) return <div>Error loading settings</div>;
@@ -169,7 +168,15 @@ const Header = ({ togglePanel }) => {
                         <FaCartShopping className='cart' />({totalItems})
                     </button>
 
-                    <Link to={'/wishlist'} onClick={checkUser} className='btn heart-btn'>
+                    <Link 
+                        to={'/wishlist'} 
+                        onClick={(e) => {
+                            if (!checkUser()) {
+                                e.preventDefault();
+                            }
+                        }} 
+                        className='btn heart-btn'
+                    >
                         <FaHeart className='heart' />
                     </Link>
 
