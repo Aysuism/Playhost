@@ -29,7 +29,7 @@ const FavProducts = () => {
 
         {favItems.length === 0 ? (
           <div className="empty-wishlist text-center py-5">
-            <img src='../../../public/no_wish_list-removebg-preview.png' alt="no-item" />
+            <img src='/no_wish_list-removebg-preview.png' alt="no-item" />
             <h1>{lang==='AZ'?'Istək Siyahınız Boşdur!':'Your WishList is empty!'}</h1>
           </div>
         ) : (
