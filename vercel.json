@@ -3,6 +3,10 @@
     {
       "source": "/auth/login",
       "destination": "/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/"
     }
   ]
 }
