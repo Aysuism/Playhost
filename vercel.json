@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://playhost-backend.onrender.com/api/:path*"
+      "destination": "https://playhost-backend.onrender.com/ad/apis/api/:path*"
     },
     {
       "source": "/auth/login",
