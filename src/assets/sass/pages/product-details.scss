@@ -72,6 +72,10 @@
             span {
                 color: var(--Kcolor);
                 font-size: 15px;
+
+                @media (max-width:500px) {
+                    font-size: 10px;
+                }
             }
 
             .rc-slider-dot-active {
@@ -265,10 +269,10 @@
                                 @include h1;
                                 margin-bottom: 15px;
                                 font-size: 2rem;
-
+                                word-break: break-word;
                             }
 
-                            p{
+                            p {
                                 font-weight: 700;
                                 font-size: 20px;
                             }
@@ -321,10 +325,11 @@
                     }
                 }
             }
-            
-            .no-comment-yet{
+
+            .no-comment-yet {
                 background-color: $purple;
-                .btn{
+
+                .btn {
                     @include purple-outline-btn;
                 }
             }
@@ -333,17 +338,6 @@
                 .dashboard-grid {
                     grid-template-columns: 1fr;
                     padding: 0;
-                }
-            }
-        }
-    }
-
-    @media (max-width:500px) {
-
-        .configurations {
-            .slots {
-                span {
-                    font-size: 10px;
                 }
             }
         }
