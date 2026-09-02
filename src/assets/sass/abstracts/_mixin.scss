@@ -1,0 +1,99 @@
+@mixin section ($include-span: false){
+    background-color: var(--bg-color);
+    padding: 5% 2%;
+    display: flex;
+    align-items: center;
+
+    @if $include-span {
+        span {
+          @include span;
+          background-color: transparent;
+        }
+      }
+
+    h1 {
+        @include h1;
+    }
+
+    p {
+        color: $color-light-gray;
+    }
+
+    @media (max-width:700px) {
+        h1{
+            font-size: 40px;
+        }
+    }
+}
+
+@mixin hero {
+    @include section(true);
+    height: 50vh;
+    background-position: center;
+    background-attachment: fixed;
+    background-size: cover;
+
+}
+
+@mixin span {
+    width: max-content;
+    background-color: $bg-color;
+    color: #fff;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-radius: 24px;
+    font-weight: bold;
+    padding: 5px 15px;
+    margin-bottom: 16px;
+}
+
+@mixin h1 {
+    background: linear-gradient(to top, #8b8b9b, #fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 56px;
+    font-weight: bold;
+    padding-top: 20px;
+}
+
+@mixin purple-btn($background-color: linear-gradient(to right, #5623d8, #6a79fa)) {
+    background: $background-color;
+    width: max-content;
+    padding: 7px 20px;
+    border-radius: 5px;
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    font-family: $font-Oxanium;
+    transition: all .3s ease;
+
+    &:hover {
+        transform: scale(1.1);
+        box-shadow: 0px 0px 20px $purple;
+    }
+}
+
+@mixin purple-outline-btn {
+    background-color: transparent;
+    border: 2px solid #5623D8;
+    border-radius: 5px;
+    padding: 5px 15px;
+    margin: 0 5px;
+    color: #fff;
+    font-weight: bold;
+    transition: all .3s ease;
+    z-index: 2;
+
+    &:hover {
+        background-color: #5623D8;
+        color: #fff;
+    }
+
+}
+
+@mixin d-flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}

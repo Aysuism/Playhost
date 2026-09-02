@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://playhost-backend-production.up.railway.app/api/:path*"
+    },
+    {
+      "source": "/auth/login",
+      "destination": "/index.html"
+    }
+  ]
+}

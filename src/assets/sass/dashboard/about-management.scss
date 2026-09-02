@@ -1,0 +1,27 @@
+.about-management {
+    .about-menu {
+        text-decoration: none;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+
+        .about-menu-item {
+            width: 100%;
+            @include d-flex;
+            @include purple-outline-btn;
+            color: var(--Kcolor);
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 16px;
+            margin-bottom: 30px;
+
+            &:active {
+                @include purple-btn;
+                width: 100%;
+
+            }
+
+        }
+    }
+}

@@ -1,0 +1,90 @@
+footer {
+    background-color: #0F101E;
+    padding: 5%;
+
+    p {
+        color: #92939e;
+        padding: 20px 0;
+    }
+
+    h5 {
+        color: #fff;
+    }
+
+    .nav {
+        li {
+            .nav-link {
+                color: #92939e;
+            }
+        }
+    }
+
+    form {
+        width: 100%;
+
+        .form-control {
+            width: 80%;
+            background-color: rgba(255, 255, 255, .1);
+            border: none;
+            border-radius: 30px 0 0 30px;
+            color: #fff;
+
+            &::placeholder {
+                color: #92939e;
+            }
+
+            &:focus {
+                background-color: rgba(255, 255, 255, .1);
+                box-shadow: 0 0 5px 5px $purple;
+                color: #fff;
+
+            }
+
+
+        }
+
+        .email-bar {
+            display: flex;
+
+            .email-btn {
+                @include purple-btn;
+                width: 20%;
+                border-radius: 0 30px 30px 0;
+
+                .right-arrow {
+                    font-size: 30px;
+                }
+            }
+        }
+    }
+
+    .follow-us {
+        width: 100%;
+        display: flex;
+        gap: 10px;
+        padding: 30px 0 0 5px;
+
+        a {
+            background-color: rgba(255, 255, 255, .1);
+            padding: 10px;
+            border-radius: 10px;
+            transition: all .3s ease;
+
+            .icon {
+                color: $purple;
+                font-size: 20px;
+
+            }
+
+            &:hover {
+                background-color: #fff;
+            }
+        }
+    }
+
+    .terms-and-conditions {
+        display: flex;
+        justify-content: space-between;
+        border-top: 1px solid #92939e;
+    }
+}
