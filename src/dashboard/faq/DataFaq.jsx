@@ -61,7 +61,6 @@ const DataFaq = ({ faqs, refetch, isLoading, isError }) => {
                 {faqs.map((item) => (
                     <div key={item._id} className="dashboard-card">
                         <div className="dashboard-content">
-                            <h6>#{item.questionId}</h6>
                             <h5 className="dashboard-heading"><span className="dashboard-heading-label">{lang === 'AZ' ? 'Başlıq (Az): ' : 'Title (Az): '}</span>{item.titleAze}</h5>
                             <h5 className="dashboard-heading"><span className="dashboard-heading-label">{lang === 'AZ' ? 'Başlıq (En): ' : 'Title (En): '}</span>{item.titleEng}</h5>
                             <div className="dashboard-description">

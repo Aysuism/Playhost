@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { useDeleteCategoryMutation } from '../../tools/api/games-category';
 import { LangContext } from '../../../context/LangContext';
 import EditCatForm from './EditCatForm';
+import { notify } from '../../../hooks/useNotify';
 
 const DataCat = ({ categories = [], refetch, isLoading, isError }) => {
     const { lang } = useContext(LangContext)

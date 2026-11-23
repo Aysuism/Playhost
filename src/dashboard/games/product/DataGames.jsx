@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { useDeleteGameMutation, useGetGamesQuery } from '../../tools/api/games';
 import EditGamesForm from './EditGamesForm';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
 const DataGames = ({ games, refetch }) => {
   const { lang } = useContext(LangContext);

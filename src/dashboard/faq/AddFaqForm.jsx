@@ -6,7 +6,6 @@ import { notify } from '../../hooks/useNotify';
 const AddFaqForm = ({ refetch, onClose }) => {
     const { lang } = useContext(LangContext);
     const [formData, setFormData] = useState({
-        questionId: 1,
         titleAze: '',
         titleEng: '',
         descriptionAze: '',
@@ -25,7 +24,6 @@ const AddFaqForm = ({ refetch, onClose }) => {
 
         try {
             await addFaq({
-                questionId: Number(formData.questionId),
                 titleAze: formData.titleAze,
                 titleEng: formData.titleEng,
                 descriptionAze: formData.descriptionAze,
@@ -35,7 +33,6 @@ const AddFaqForm = ({ refetch, onClose }) => {
             notify.added();
 
             setFormData(prev => ({
-                questionId: prev.questionId + 1,
                 titleAze: '',
                 titleEng: '',
                 descriptionAze: '',
@@ -51,19 +48,6 @@ const AddFaqForm = ({ refetch, onClose }) => {
 
     return (
         <form onSubmit={handleSubmit} className="form-container p-3 border rounded">
-            <div className="mb-3">
-                <label htmlFor="questionId" className="form-label">{lang === 'AZ' ? 'Sual ID' : 'Question ID'}</label>
-                <input
-                    type="number"
-                    id="questionId"
-                    name="questionId"
-                    className="form-control"
-                    value={formData.questionId}
-                    onChange={handleChange}
-                    required
-                    min="1"
-                />
-            </div>
             <div className="mb-3">
                 <label htmlFor="titleAze" className="form-label">{lang === 'AZ' ? 'Sual (Aze)' : 'Question (Aze)'}</label>
                 <input

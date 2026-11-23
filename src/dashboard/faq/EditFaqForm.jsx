@@ -6,7 +6,6 @@ import { notify } from '../../hooks/useNotify';
 const EditFaqForm = ({ faq, onClose, refetch }) => {
     const { lang } = useContext(LangContext);
     const [formData, setFormData] = useState({
-        questionId: '',
         titleAze: '',
         titleEng: '',
         descriptionAze: '',
@@ -18,7 +17,6 @@ const EditFaqForm = ({ faq, onClose, refetch }) => {
     useEffect(() => {
         if (faq) {
             setFormData({
-                questionId: faq.questionId || '',
                 titleAze: faq.titleAze || '',
                 titleEng: faq.titleEng || '',
                 descriptionAze: faq.descriptionAze || '',
@@ -29,10 +27,7 @@ const EditFaqForm = ({ faq, onClose, refetch }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: name === 'questionId' ? Number(value) : value
-        });
+        setFormData({ ...formData, [name]: value });
     };
 
     const handleSubmit = async (e) => {
@@ -60,21 +55,6 @@ const EditFaqForm = ({ faq, onClose, refetch }) => {
 
     return (
         <form onSubmit={handleSubmit} className="form-container p-4 border rounded">
-            <div className="mb-3">
-                <label htmlFor="questionId" className="form-label">{lang === 'AZ' ? 'Sual ID' : 'Question ID'}</label>
-                <input
-                    type="number"
-                    id="questionId"
-                    name="questionId"
-                    className="form-control"
-                    value={formData.questionId}
-                    onChange={handleChange}
-                    placeholder={lang === 'AZ' ? 'Sual ID daxil edin' : 'Enter question ID'}
-                    required
-                    min="1"
-                />
-            </div>
-
             <div className="mb-3">
                 <label htmlFor="titleAze" className="form-label">{lang === 'AZ' ? 'Sual (Aze)' : 'Question (Aze)'}</label>
                 <input
