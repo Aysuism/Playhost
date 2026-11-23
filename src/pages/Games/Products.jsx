@@ -3,7 +3,7 @@ import SingleCard from '../../components/SingleCard';
 import { useContext } from 'react';
 import { LangContext } from '../../context/LangContext';
 
-const Products = ({ keyword, filtered, selectedCategory, games, sortOption }) => {
+const Products = ({ keyword, filtered, selectedCategory, games }) => {
     const { lang } = useContext(LangContext)
     const gamesWithDiscount = games.map((game) => {
         const discountPercentage = game.discountIndicator
@@ -24,7 +24,7 @@ const Products = ({ keyword, filtered, selectedCategory, games, sortOption }) =>
             let matchesCategory = true;
             if (selectedCategory) {
                 if (typeof game.gameCategory === 'object' && game.gameCategory !== null) {
-                    matchesCategory = game.gameCategory.categoryId === selectedCategory;
+                    matchesCategory = game.gameCategory._id === selectedCategory;
                 } else {
                     matchesCategory = game.gameCategory === selectedCategory;
                 }

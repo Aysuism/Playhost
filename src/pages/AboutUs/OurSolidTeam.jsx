@@ -2,6 +2,7 @@ import React from 'react'
 import { useContext } from 'react'
 import { LangContext } from '../../context/LangContext'
 import { useGetTeamMembersQuery } from '../../dashboard/tools/api/about-team'
+import { BASE_URL } from '../../app'
 
 const OurSolidTeam = () => {
     const { data: team=[]} = useGetTeamMembersQuery()
@@ -21,7 +22,7 @@ const OurSolidTeam = () => {
 
                     <div key={item._id} className="col-lg-3 col-md-4 col-sm-12" data-aos="fade-up">
                         <div className="profile">
-                            <img src={`https://playhost-backend-production.up.railway.app/${item.teamImage}`} alt="" />
+                            <img src={BASE_URL + item.teamImage} alt="" />
                             <h4>{lang==='AZ'? item.fullname: item.fullname}</h4>
                             <p>{lang==='AZ'? item.roleAze: item.roleEng}</p>
                         </div>

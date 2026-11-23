@@ -1,8 +1,9 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from '../../../app';
 
 export const counterApi = createApi({
   reducerPath: 'counterApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://playhost-backend-production.up.railway.app/' }),
+  baseQuery,
   tagTypes: ['Counter'],
   endpoints: (builder) => ({
     getCounters: builder.query({

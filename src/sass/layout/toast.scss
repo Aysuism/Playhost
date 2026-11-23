@@ -1,0 +1,323 @@
+.toast-stack {
+    // ---------- dark (default) ----------
+    --tt-text: #f2f2f5;
+    --tt-muted: #9b9ba6;
+    --tt-bg: rgba(1,3,20, 0.88);
+    --tt-border: rgba(255, 255, 255, 0.09);
+    --tt-shadow: 0 12px 32px rgba(41, 4, 4, 0.45);
+    --tt-track: rgba(255, 255, 255, 0.08);
+    --tt-close: #171795;
+    --tt-close-hover: #f2f2f5;
+
+    // ---------- light ----------
+    &.toast-stack-light {
+        --tt-text: #1a1a22;
+        --tt-muted: #5e5e6c;
+        --tt-bg: rgba(255, 255, 255, 0.86);
+        --tt-border: rgba(0, 0, 0, 0.09);
+        --tt-shadow: 0 12px 32px rgba(30, 20, 70, 0.16);
+        --tt-track: rgba(0, 0, 0, 0.06);
+        --tt-close: #7a7a88;
+        --tt-close-hover: #1a1a22;
+    }
+
+    // ---------- container + positions ----------
+    position: fixed;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 380px;
+    max-width: calc(100vw - 24px);
+    padding: 16px;
+    pointer-events: none;
+
+    &-top-right {
+        top: 0;
+        right: 0;
+    }
+
+    &-top-left {
+        top: 0;
+        left: 0;
+    }
+
+    &-top-center {
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    &-bottom-right {
+        bottom: 0;
+        right: 0;
+    }
+
+    &-bottom-left {
+        bottom: 0;
+        left: 0;
+    }
+
+    &-bottom-center {
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+// ---------- toast card ----------
+.toast-stack .toast-item {
+    --toast-color: #a1a1aa;
+
+    // keep Bootstrap's toast variables from overriding us
+    --bs-toast-color: var(--tt-text);
+    --bs-toast-bg: transparent;
+    --bs-toast-border-color: transparent;
+    --bs-toast-box-shadow: none;
+
+    pointer-events: auto;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    color: var(--tt-text);
+    background-color: var(--tt-bg);
+    border: 1px solid var(--tt-border);
+    border-radius: 12px;
+    box-shadow: var(--tt-shadow);
+
+    // soft colored glow along the top edge
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 12%;
+        right: 12%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--toast-color), transparent);
+        opacity: 0.55;
+        pointer-events: none;
+    }
+
+    &.toast-success {
+        --toast-color: #3ecf8e;
+    }
+
+    &.toast-error {
+        --toast-color: #ef4d6a;
+    }
+
+    &.toast-warning {
+        --toast-color: #f5b83d;
+    }
+
+    &.toast-info {
+        --toast-color: #6aa7ff;
+    }
+
+    &.toast-default {
+        --toast-color: #a1a1aa;
+    }
+}
+
+.toast-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 14px 16px 16px;
+}
+
+.toast-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: var(--toast-color);
+}
+
+.toast-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.toast-title {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--tt-text);
+}
+
+.toast-message {
+    margin-top: 3px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--tt-muted);
+    word-break: break-word;
+}
+
+.toast-close {
+    display: inline-flex;
+    flex-shrink: 0;
+    padding: 2px;
+    border: none;
+    background: transparent;
+    color: var(--tt-close);
+    cursor: pointer;
+    transition: color 0.15s;
+
+    &:hover {
+        color: var(--tt-close-hover);
+    }
+}
+
+.toast-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.toast-btn {
+    padding: 5px 14px;
+    font-size: 13px;
+    border-radius: 8px;
+    border: 1px solid var(--tt-border);
+    background: transparent;
+    color: var(--tt-text);
+    cursor: pointer;
+    transition: background 0.15s, filter 0.15s;
+
+    &:hover {
+        background: var(--tt-track);
+    }
+}
+
+.toast-btn-primary {
+    background: var(--toast-color);
+    border-color: var(--toast-color);
+    color: #1a1a22;
+    font-weight: 500;
+
+    &:hover {
+        background: var(--toast-color);
+        filter: brightness(1.1);
+    }
+}
+
+// ---------- progress line (also drives auto close) ----------
+.toast-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--tt-track);
+}
+
+.toast-progress-bar {
+    height: 100%;
+    width: 100%;
+    background: var(--toast-color);
+    transform-origin: left;
+    animation: toast-progress linear forwards;
+}
+
+.toast-timer {
+    position: absolute;
+    width: 0;
+    height: 0;
+    animation: toast-timer linear forwards;
+}
+
+.toast-item:hover {
+
+    .toast-progress-bar,
+    .toast-timer {
+        animation-play-state: paused;
+    }
+}
+
+@keyframes toast-progress {
+    from {
+        transform: scaleX(1);
+    }
+
+    to {
+        transform: scaleX(0);
+    }
+}
+
+@keyframes toast-timer {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+// ---------- enter / exit ----------
+.toast-in {
+    animation: toast-in 0.3s ease-out;
+}
+
+.toast-out {
+    animation: toast-out 0.3s ease-in forwards;
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes toast-out {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+}
+
+.toast-stack-top-left,
+.toast-stack-bottom-left {
+    .toast-in {
+        animation-name: toast-in-left;
+    }
+
+    .toast-out {
+        animation-name: toast-out-left;
+    }
+}
+
+@keyframes toast-in-left {
+    from {
+        opacity: 0;
+        transform: translateX(-40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes toast-out-left {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(-40px);
+    }
+}

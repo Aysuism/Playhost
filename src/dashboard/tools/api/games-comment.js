@@ -1,21 +1,43 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from '../../../app';
 
 export const gameCommentApi = createApi({
   reducerPath: 'gameCommentApi',
-  baseQuery: fetchBaseQuery({ 
-    baseUrl: 'https://playhost-backend-production.up.railway.app/',
-    prepareHeaders: (headers) => {
-      headers.set('x-auth-token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSXNsYW0iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDQzNzYyMTZ9.IOXM_l3GyD0pp3RAXKrURsJyCHXrSrBpzPCAHR5BqSw');
-      return headers;
-    }
-  }),
+  baseQuery,
   tagTypes: ['Comment'],
   endpoints: (builder) => ({
     getComments: builder.query({
       query: () => '/gamecustomerreviews',
       providesTags: ['Comment'],
     }),
+
+    // ---------- public site (logged-in users, JSON) ----------
     addComment: builder.mutation({
+      query: (body) => ({
+        url: '/gamecustomerreviews',          // NO /ad/gamespage here
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Comment'],
+    }),
+    editComment: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/gamecustomerreviews/${id}`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: ['Comment'],
+    }),
+    deleteComment: builder.mutation({
+      query: (id) => ({
+        url: `/gamecustomerreviews/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Comment'],
+    }),
+
+    // ---------- dashboard (admin, FormData) ----------
+    adminAddComment: builder.mutation({
       query: (formData) => ({
         url: '/ad/gamespage/gamecustomerreviews',
         method: 'POST',
@@ -23,7 +45,7 @@ export const gameCommentApi = createApi({
       }),
       invalidatesTags: ['Comment'],
     }),
-    editComment: builder.mutation({
+    adminEditComment: builder.mutation({
       query: ({ id, formData }) => ({
         url: `/ad/gamespage/gamecustomerreviews/${id}`,
         method: 'PUT',
@@ -31,7 +53,7 @@ export const gameCommentApi = createApi({
       }),
       invalidatesTags: ['Comment'],
     }),
-    deleteComment: builder.mutation({
+    adminDeleteComment: builder.mutation({
       query: (id) => ({
         url: `/ad/gamespage/gamecustomerreviews/${id}`,
         method: 'DELETE',
@@ -46,4 +68,7 @@ export const {
   useAddCommentMutation,
   useEditCommentMutation,
   useDeleteCommentMutation,
+  useAdminAddCommentMutation,
+  useAdminEditCommentMutation,
+  useAdminDeleteCommentMutation,
 } = gameCommentApi;

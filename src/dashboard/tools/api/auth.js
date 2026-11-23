@@ -1,21 +1,13 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery, } from '../../../app';
 
 export const authApi = createApi({
   reducerPath: 'authApi',
-  baseQuery: fetchBaseQuery({ 
-    baseUrl: 'https://playhost-backend-production.up.railway.app/',
-    prepareHeaders: (headers) => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        headers.set('x-auth-token', token); 
-      }
-      return headers;
-    }
-  }),
+  baseQuery,
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (credentials) => ({
-        url: '/api/auth/login', 
+        url: '/api/auth/login',
         method: 'POST',
         body: credentials,
       }),
@@ -33,8 +25,7 @@ export const authApi = createApi({
   }),
 });
 
-export const { 
-  useLoginMutation, 
-  useRegisterMutation, 
-  useGetMeQuery 
+export const {
+  useLoginMutation,
+  useRegisterMutation,
 } = authApi;

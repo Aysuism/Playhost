@@ -1,8 +1,8 @@
-import React, { useState, useContext } from 'react';
-import Swal from 'sweetalert2';
+import { useState, useContext } from 'react';
 import EditCounterForm from './EditCounterForm';
 import { useDeleteCounterMutation } from '../../tools/api/about-counter';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
 const DataCounter = ({ counters, refetch }) => {
   const { lang } = useContext(LangContext);
@@ -10,34 +10,7 @@ const DataCounter = ({ counters, refetch }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [deleteCounter, { isLoading: isDeleting }] = useDeleteCounterMutation();
 
-  const handleDelete = async (id) => {
-    Swal.fire({
-      title: lang === 'AZ' ? 'Sayğac Silinsin?' : 'Delete Counter?',
-      text: lang === 'AZ' ? 'Bu əmri geri qaytarmaq mümkün deyil!' : "This action cannot be undone!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: lang === 'AZ' ? 'Sil' : 'Delete',
-      cancelButtonText: lang === 'AZ' ? 'Ləğv et' : 'Cancel'
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await deleteCounter(id).unwrap();
-          Swal.fire(
-            lang === 'AZ' ? 'Silindi!' : 'Deleted!',
-            lang === 'AZ' ? 'Sayğac uğurla silindi!' : 'Counter deleted successfully!',
-            'success'
-          );
-          refetch();
-        } catch (error) {
-          Swal.fire(
-            lang === 'AZ' ? 'Xəta!' : 'Error!',
-            error.data?.message || (lang === 'AZ' ? 'Sayğac silinərkən xəta baş verdi.' : 'Failed to delete counter.'),
-            'error'
-          );
-        }
-      }
-    });
-  };
+  const handleDelete = (id) => notify.deleteItem(() => deleteCounter(id).unwrap(), refetch);
 
   return (
     <div className="dashboard-container">
@@ -127,8 +100,8 @@ const DataCounter = ({ counters, refetch }) => {
                   ) : (
                     <i className="fas fa-trash-alt me-2"></i>
                   )}
-                  {isDeleting ? 
-                    (lang === 'AZ' ? 'Silinir...' : 'Deleting...') : 
+                  {isDeleting ?
+                    (lang === 'AZ' ? 'Silinir...' : 'Deleting...') :
                     (lang === 'AZ' ? 'Sil' : 'Delete')}
                 </button>
               </div>

@@ -8,6 +8,7 @@ const ProductManagement = () => {
     const { lang } = useContext(LangContext);
     const { data: games=[],refetch } = useGetGamesQuery();
     const [showModal, setShowModal] = useState(false);
+    
     return (
         <div className='product-management'>
             {showModal && (

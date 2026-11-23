@@ -37,6 +37,7 @@
             font-size: 40px;
             transition: all .3s ease;
             border-radius: 50%;
+
             &:hover {
                 transform: scale(1.1);
                 box-shadow: 0 0 5px $purple, 0 0 10px $purple, 0 0 15px $purple, 0 0 20px $purple, 0 0 30px $purple, 0 0 40px $purple, 0 0 55px $purple, 0 0 75px $purple, 0 0 2px $purple;
@@ -116,16 +117,21 @@
             color: black;
         }
 
-        .checkout-btn {
-            @include purple-outline-btn;
-            color: #000;
-            text-decoration: none;
-            padding-top: 8px;
-            padding-bottom: 8px;
-        }
+        .buttons {
+            display: flex;
+            gap: 10px;
 
-        .emptyall {
-            @include purple-btn;
+            .checkout-btn {
+                @include purple-outline-btn;
+                color: #000;
+                text-decoration: none;
+                padding-top: 8px;
+                padding-bottom: 8px;
+            }
+
+            .emptyall {
+                @include purple-btn;
+            }
         }
     }
 

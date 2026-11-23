@@ -1,181 +1,144 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import Aos from 'aos';
-import Swal from 'sweetalert2';
-import { useContext } from 'react';
+
+import { setCredentials, logout } from '../../dashboard/tools/api/auth-slice';
+import { wishlistApi } from '../../dashboard/tools/api/wishlist';
+import { cartApi } from '../../dashboard/tools/api/cart';
 import { LangContext } from '../../context/LangContext';
+import { notify } from '../../hooks/useNotify';
+import { apiFetch } from '../../app';
+import Aos from 'aos';
 
-export const staticUsers = [
-  {
-    username: 'RegularUser',
-    email: 'user@example.com',
-    password: 'user123',
-    role: 'user'
-  }
+const MailIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="m4 7 8 6 8-6" />
+  </svg>
+);
 
-];
+const LockIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <rect x="4" y="10" width="16" height="11" rx="2" />
+    <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+    <path d="M12 14v3" />
+  </svg>
+);
 
-
-const LoginPage = () => {
-  const { lang } = useContext(LangContext)
-
-  useEffect(() => {
-    Aos.init({ duration: 1000, offset: 130, easing: 'ease-in-out', once: true });
-
-    if (!localStorage.getItem('users')) {
-      localStorage.setItem('users', JSON.stringify(staticUsers));
-    }
-  }, []);
+const LoginForm = () => {
+  const { lang } = useContext(LangContext);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loggedInUser, setLoggedInUser] = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('loggedInUser'));
-    if (storedUser) {
-      setIsLoggedIn(true);
-      setLoggedInUser(storedUser);
-    }
+    Aos.init({ duration: 1000, offset: 130, easing: 'ease-in-out', once: true });
   }, []);
 
+  const getName = (u) => u?.username || u?.name || '';
+
   const handleLogout = () => {
-    localStorage.removeItem('loggedInUser');
-    setIsLoggedIn(false);
-    setLoggedInUser(null);
-    Swal.fire({
-      icon: 'success',
-      title: lang === 'AZ' ? 'Daxil Olma Uğurludur' : 'Logged out successfully!',
-      confirmButtonText: lang === 'AZ' ? 'Tamam' : 'OK',
-    });
+    dispatch(logout());
+    dispatch(wishlistApi.util.resetApiState());
+    dispatch(cartApi.util.resetApiState());
+
+    notify.info('Hesabdan çıxdınız', 'You have been logged out');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const users = JSON.parse(localStorage.getItem('users')) || [];
 
-    if (isSignUp) {
-      if (users.some((user) => user.email === email)) {
-        Swal.fire({ icon: 'error', title: 'Email already in use!' });
+    try {
+      const res = await apiFetch('auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        notify.error('Yanlış Email və ya Şifrə', 'Incorrect Email or Password!', await res.text());
         return;
       }
 
-      const newUser = {
-        username,
-        email,
-        password,
-        role: "user"
-      };
+      const data = await res.json();
+      dispatch(setCredentials({ token: data.token, user: data.user }));
 
-      const updatedUsers = [...users, newUser];
-      localStorage.setItem('users', JSON.stringify(updatedUsers));
-
-      Swal.fire({
-        icon: 'success',
-        title: lang === 'AZ' ? 'Hesab Yaradıldı' : 'Account Created!',
-        text: lang === 'AZ' ? 'Artıq yeni hesabınızla giriş edə bilərsiniz' : 'You can now login with your new account'
-      }).then(() => {
-        setIsSignUp(false);
-        setUsername('');
-        setEmail('');
-        setPassword('');
-      });
-    } else {
-      const user = users.find((user) => user.email === email && user.password === password);
-
-      if (user) {
-        localStorage.setItem('loggedInUser', JSON.stringify(user));
-        setIsLoggedIn(true);
-        setLoggedInUser(user);
-
-        setTimeout(() => {
-          Swal.fire({
-            icon: 'success',
-            title: lang === 'AZ' ? `Xoşgəldiniz, ${user.username}!` : `Welcome, ${user.username}!`,
-            timer: 1500,
-            showConfirmButton: false
-          }).then(() => {
-            navigate('/', { state: { refreshed: true } });
-            window.location.reload();
-          });
-        }, 100);
-      } else {
-        Swal.fire({ icon: 'error', title: lang === 'AZ' ? 'Yanlış Email və ya Şifrə' : 'Incorrect Email or Password!' });
-      }
+      notify.success(`Xoşgəldiniz, ${getName(data.user)}!`, `Welcome, ${getName(data.user)}!`);
+      navigate('/');
+    } catch (err) {
+      notify.error('Server ilə əlaqə yoxdur', 'Cannot reach the server');
     }
   };
 
   return (
-    <>
-
-      <section className="form-container sign-in">
-        {isLoggedIn ? (
-          <div className="welcome-section">
-            <h1>{lang === 'AZ' ? 'Xoşgəldiniz' : 'Welcome'}, {loggedInUser?.username}!</h1>
-            <p>{lang === 'AZ' ? 'İstifadəçi hesabı' : 'User account'}</p>
-            <div className="auth-links">
-              <button onClick={handleLogout} className="auth-button">{lang === 'AZ' ? 'Hesabdan Çıx' : 'Log Out'}</button>
-            </div>
+    <section className="form-container sign-in">
+      {isAuthenticated ? (
+        <div className="welcome-section">
+          <h1>{lang === 'AZ' ? 'Xoşgəldiniz' : 'Welcome'}, {getName(user)}!</h1>
+          <div className="auth-links">
+            <button onClick={handleLogout} className="auth-button">
+              {lang === 'AZ' ? 'Hesabdan Çıx' : 'Log Out'}
+            </button>
           </div>
-        ) : (
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="auth-form">
+          <h1>{lang === 'AZ' ? 'Hesabına Giriş Et' : 'Log In to Your Account'}</h1>
+          <p className="auth-subtitle">
+            {lang === 'AZ' ? 'Davam etmək üçün hesabına daxil ol' : 'Sign in to continue'}
+          </p>
 
-          <form onSubmit={handleSubmit} className="auth-form">
-            <h1>{isSignUp ? lang === 'AZ' ? 'Hesab Yarat' : 'Create An Account' : lang === 'AZ' ? 'Daxil Ol' : 'Login'}</h1>
-            {isSignUp && (
-              <div className="form-group">
-                <input
-                  type="text"
-                  id="username"
-                  value={username}
-                  placeholder={lang === 'AZ' ? 'Istifadəçi Adı' : 'Username'}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-              </div>
-            )}
-
-            <div className="form-group">
+          <div className="form-group">
+            <label htmlFor="login-email">
+              {lang === 'AZ' ? 'Email Ünvanı' : 'Email Address'}
+            </label>
+            <div className="input-wrap">
+              <span className="input-icon"><MailIcon /></span>
               <input
                 type="email"
-                id="email"
+                id="login-email"
                 value={email}
-                placeholder={lang === 'AZ' ? 'Email Adres' : 'Email Adress'}
+                placeholder={lang === 'AZ' ? 'Email Ünvanı' : 'Email Address'}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
+          </div>
 
-            <div className="form-group">
+          <div className="form-group">
+            <label htmlFor="login-password">
+              {lang === 'AZ' ? 'Şifrə' : 'Password'}
+            </label>
+            <div className="input-wrap">
+              <span className="input-icon"><LockIcon /></span>
               <input
                 type="password"
-                id="password"
+                id="login-password"
                 value={password}
                 placeholder={lang === 'AZ' ? 'Şifrə' : 'Password'}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength="6"
+                minLength="8"
               />
             </div>
+          </div>
 
-            <button type="submit" className="auth-submit">
-              {isSignUp ? (lang === 'AZ' ? 'Hesab Yarat' : 'Create Account') : (lang === 'AZ' ? 'Daxil olun' : 'Log In')}
-            </button>
-            <div className="auth-toggle">
-              {isSignUp ? (
-                <>{lang === 'AZ' ? 'Artıq Hesabınız var?' : 'Already have an account?'}<br /> <span onClick={() => setIsSignUp(false)} className="auth-switch">{lang === 'AZ' ? 'Daxil Ol' : 'Login'}</span></>
-              ) : (
-                <>{lang === 'AZ' ? 'Hesabınız Yoxdur?' : 'Don\'t have an account'} <br /> <span onClick={() => setIsSignUp(true)} className="auth-switch">{lang === 'AZ' ? 'Hesab Yarat' : 'Register'}</span></>
-              )}
-            </div>
-          </form>
-        )}
-      </section>
-    </>
+          <button type="submit" className="auth-submit">
+            {lang === 'AZ' ? 'Daxil Ol' : 'Log In'} <span aria-hidden="true">›</span>
+          </button>
+
+          <div className="auth-toggle">
+            {lang === 'AZ' ? 'Hesabınız yoxdur?' : "Don't have an account?"}{' '}
+            <Link to="/auth/register" className="auth-switch">
+              {lang === 'AZ' ? 'Qeydiyyatdan keçin' : 'Register'}
+            </Link>
+          </div>
+        </form>
+      )}
+    </section>
   );
 };
 
-export default LoginPage;
+export default LoginForm;

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useEditReviewMutation } from '../../tools/api/about-review';
-import Swal from 'sweetalert2';
 import { useContext } from 'react';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
 const EditReviewForm = ({ review, onClose, refetch }) => {
   const { lang } = useContext(LangContext)
@@ -33,21 +33,11 @@ const EditReviewForm = ({ review, onClose, refetch }) => {
 
     try {
       await editReview({ id: review._id, formData: data }).unwrap();
-      Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: 'Review updated successfully!',
-        timer: 2000,
-        showConfirmButton: true
-      });
+      notify.updated();
       refetch();
       onClose();
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error!',
-        text: error.data?.message || 'Failed to update review',
-      });
+      notify.updateFailed(error.data?.message);
     }
   };
 

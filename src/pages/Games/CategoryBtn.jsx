@@ -13,14 +13,14 @@ const CategoryBtn = ({ selectCategory, resetCategory, activeCategory, handleSort
         <button className={`${activeCategory ? 'btn' : 'btn-active'}`} onClick={resetCategory}>{lang === 'AZ' ? 'Bütün oyunlar' : 'All Games'}</button>
 
         {categories.map((category) => (
-          <button key={category._id} className={`${activeCategory === category.categoryId ? 'btn-active' : 'btn'}`}
-            onClick={() => selectCategory(category.categoryId)}>{category.category}</button>
+          <button key={category._id} className={`${activeCategory === category?._id ? 'btn-active' : 'btn'}`}
+            onClick={() => selectCategory(category?._id)}>{category?.category}</button>
         ))}
 
         {/* Sort dropdown */}
         <div className="dropdown ms-3">
           <button
-            className="btn btn-secondary dropdown-toggle"
+            className="btn btn-secondary dropdown-toggle d-flex! flex-row!"
             type="button"
             id="sortDropdown"
             data-bs-toggle="dropdown"

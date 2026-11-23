@@ -1,30 +1,27 @@
-import React from 'react'
 import { useContext } from 'react'
 import { FaRegTrashAlt } from 'react-icons/fa'
-import { useCart } from 'react-use-cart'
-import { useWishlist } from 'react-use-wishlist'
-import Swal from 'sweetalert2'
 import { LangContext } from '../context/LangContext'
+import { useServerWishlist } from '../hooks/useServerWishlist'
+import { useServerCart } from '../hooks/useServerCart'
+import { notify } from '../hooks/useNotify'
 
 const WishlistCard = ({ wishListData }) => {
     const { lang } = useContext(LangContext)
-    const { removeWishlistItem } = useWishlist()
-    const { addItem } = useCart()
+    const { removeWishlistItem } = useServerWishlist()
+    const { addItem } = useServerCart()
 
-    const addToCart = () => {
-        addItem(wishListData)
-        Swal.fire({
-            title: lang === 'AZ' ? 'Məhsul əlavə edildi' : 'Product added',
-            icon: "success"
-        })
-    }
-    console.log(wishListData);
+    const addToCart = async () => {
+        const ok = await addItem(wishListData);
+        if (ok) {
+            notify.success('Məhsul əlavə edildi', 'Product added');
+        }
+    };
 
     return (
         <div className="wishlist-box">
             <div className="row d-flex align-items-center g-3">
                 <div className="col-lg-3 col-md-6 col-sm-12">
-                    <img src={`https://playhost-backend-production.up.railway.app/${wishListData.imageUrl}`} alt={wishListData.title} />
+                    <img src={`http://localhost:3333/${wishListData.imageUrl?.[0]}`} alt={wishListData.gameName} />
                 </div>
                 <div className="col-lg-6 col-md-6 col-sm-12">
                     <div className="details">
@@ -44,7 +41,7 @@ const WishlistCard = ({ wishListData }) => {
                     </button>
                     <button
                         className="trash-can"
-                        onClick={() => { removeWishlistItem(wishListData.id) }}
+                        onClick={() => removeWishlistItem(wishListData.id).catch(() => { })}
                         aria-label={lang === 'AZ' ? 'Sil' : 'Delete'}
                     >
                         <FaRegTrashAlt />

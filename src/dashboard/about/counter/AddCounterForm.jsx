@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
-import Swal from 'sweetalert2';
 import { useAddCounterMutation } from '../../tools/api/about-counter';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
 const AddCounterForm = ({ refetch, onClose }) => {
   const { lang } = useContext(LangContext);
@@ -28,12 +28,8 @@ const AddCounterForm = ({ refetch, onClose }) => {
         headingEng: formData.headingEng,
         value: formData.value
       }).unwrap();
-      Swal.fire({
-        icon: 'success',
-        title: lang === 'AZ' ? 'Uğurlu!' : 'Success!',
-        text: lang === 'AZ' ? 'Sayğac uğurla əlavə edildi.' : 'Counter successfully added.',
-        confirmButtonText: lang === 'AZ' ? 'OK' : 'OK',
-      });
+
+      notify.added();
       setFormData({
         headingAze: '',
         headingEng: '',
@@ -42,12 +38,7 @@ const AddCounterForm = ({ refetch, onClose }) => {
       refetch();
       onClose();
     } catch (err) {
-      Swal.fire({
-        icon: 'error',
-        title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-        text: lang === 'AZ' ? 'Xəta baş verdi, zəhmət olmasa yenidən cəhd edin.' : 'Something went wrong, please try again.',
-        confirmButtonText: lang === 'AZ' ? 'OK' : 'OK',
-      });
+      notify.addFailed(err.data?.message);
     }
   };
 

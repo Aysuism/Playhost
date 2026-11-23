@@ -2,6 +2,7 @@ import React from 'react'
 import { useContext } from 'react';
 import { IoStarSharp } from 'react-icons/io5'
 import { LangContext } from '../../context/LangContext';
+import { BASE_URL } from '../../app';
 
 const ServerHosting = ({ alldata }) => {
   const { lang } = useContext(LangContext)
@@ -21,7 +22,7 @@ const ServerHosting = ({ alldata }) => {
       <div className="container-fluid p-5">
         <div className="row">
           <div className="col-lg-2 col-md-4 col-sm-12 pb-5">
-            <img src={`https://playhost-backend-production.up.railway.app/${alldata.imageUrl}`} alt={alldata.title} />
+            <img src={BASE_URL + alldata.imageUrl} alt={alldata.title} />
           </div>
           <div className="col-lg-9 col-md-8 col-sm-12">
             <div className="text">

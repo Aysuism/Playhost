@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from "react";
+import { setNotifyLang } from "../hooks/useNotify";
 
 export const LangContext = createContext();
 
@@ -7,6 +8,7 @@ const LangProvider = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem("lang", lang);
+    setNotifyLang(lang);
   }, [lang]);
 
   return (

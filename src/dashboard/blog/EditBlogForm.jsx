@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
-import Swal from 'sweetalert2';
 import { useEditBlogMutation } from '../tools/api/blog';
 import { LangContext } from '../../context/LangContext';
+import { notify } from '../../hooks/useNotify';
 
 const EditBlogForm = ({ blogs, onClose }) => {
   const { lang } = useContext(LangContext);
@@ -42,21 +42,11 @@ const EditBlogForm = ({ blogs, onClose }) => {
 
     try {
       await editBlog({ id: blogs._id, formData: data }).unwrap();
-      Swal.fire({
-        icon: 'success',
-        title: lang === 'AZ' ? 'Uğur!' : 'Success!',
-        text: lang === 'AZ' ? 'Blog uğurla redaktə edildi.' : 'Blog successfully edited.',
-        confirmButtonText: 'OK',
-      });
+      notify.updated();
       onClose();
     } catch (error) {
       console.error('Error:', error);
-      Swal.fire({
-        icon: 'error',
-        title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-        text: lang === 'AZ' ? 'Xəta baş verdi, zəhmət olmasa yenidən cəhd edin.' : 'Something went wrong, please try again.',
-        confirmButtonText: 'OK',
-      });
+      notify.updateFailed(error.data?.message);
     }
   };
 
@@ -67,14 +57,14 @@ const EditBlogForm = ({ blogs, onClose }) => {
           <label htmlFor="titleAze" className="form-label">
             {lang === 'AZ' ? 'Başlıq (AZ)' : 'Title (AZ)'}
           </label>
-          <input 
-            type="text" 
-            className="form-control" 
-            id="titleAze" 
-            name="titleAze" 
-            value={formData.titleAze} 
-            onChange={handleChange} 
-            required 
+          <input
+            type="text"
+            className="form-control"
+            id="titleAze"
+            name="titleAze"
+            value={formData.titleAze}
+            onChange={handleChange}
+            required
           />
         </div>
 
@@ -82,14 +72,14 @@ const EditBlogForm = ({ blogs, onClose }) => {
           <label htmlFor="titleEng" className="form-label">
             {lang === 'AZ' ? 'Başlıq (EN)' : 'Title (EN)'}
           </label>
-          <input 
-            type="text" 
-            className="form-control" 
-            id="titleEng" 
-            name="titleEng" 
-            value={formData.titleEng} 
-            onChange={handleChange} 
-            required 
+          <input
+            type="text"
+            className="form-control"
+            id="titleEng"
+            name="titleEng"
+            value={formData.titleEng}
+            onChange={handleChange}
+            required
           />
         </div>
 
@@ -97,13 +87,13 @@ const EditBlogForm = ({ blogs, onClose }) => {
           <label htmlFor="descriptionAze" className="form-label">
             {lang === 'AZ' ? 'Təsvir (AZ)' : 'Description (AZ)'}
           </label>
-          <textarea 
-            className="form-control" 
-            id="descriptionAze" 
-            name="descriptionAze" 
-            value={formData.descriptionAze} 
-            onChange={handleChange} 
-            rows="2" 
+          <textarea
+            className="form-control"
+            id="descriptionAze"
+            name="descriptionAze"
+            value={formData.descriptionAze}
+            onChange={handleChange}
+            rows="2"
           />
         </div>
 
@@ -111,13 +101,13 @@ const EditBlogForm = ({ blogs, onClose }) => {
           <label htmlFor="descriptionEng" className="form-label">
             {lang === 'AZ' ? 'Təsvir (EN)' : 'Description (EN)'}
           </label>
-          <textarea 
-            className="form-control" 
-            id="descriptionEng" 
-            name="descriptionEng" 
-            value={formData.descriptionEng} 
-            onChange={handleChange} 
-            rows="2" 
+          <textarea
+            className="form-control"
+            id="descriptionEng"
+            name="descriptionEng"
+            value={formData.descriptionEng}
+            onChange={handleChange}
+            rows="2"
           />
         </div>
 
@@ -125,19 +115,19 @@ const EditBlogForm = ({ blogs, onClose }) => {
           <label htmlFor="imageUrl" className="form-label">
             {lang === 'AZ' ? 'Şəkil' : 'Image'}
           </label>
-          <input 
-            type="file" 
-            className="form-control" 
-            id="imageUrl" 
-            name="imageUrl" 
-            onChange={handleFileChange} 
+          <input
+            type="file"
+            className="form-control"
+            id="imageUrl"
+            name="imageUrl"
+            onChange={handleFileChange}
           />
         </div>
 
         <div className="d-flex justify-content-between">
           <button type="submit" className="btn btn-primary" disabled={isLoading}>
-            {isLoading ? 
-              (lang === 'AZ' ? 'Yenilənir...' : 'Updating...') : 
+            {isLoading ?
+              (lang === 'AZ' ? 'Yenilənir...' : 'Updating...') :
               (lang === 'AZ' ? 'Blogu Yenilə' : 'Update Blog')}
           </button>
           <button type="button" className="btn btn-secondary" onClick={onClose}>

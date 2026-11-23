@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useEditTeamMemberMutation } from '../../tools/api/about-team';
-import Swal from 'sweetalert2';
 import { useContext } from 'react';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
 const EditTeamForm = ({ member, onClose, refetch }) => {
-  const {lang}=useContext(LangContext)
+  const { lang } = useContext(LangContext)
   const [formData, setFormData] = useState({
     fullname: member.fullname,
     roleAze: member.roleAze,
@@ -38,84 +38,73 @@ const EditTeamForm = ({ member, onClose, refetch }) => {
 
     try {
       await editTeamMember({ id: member._id, formData: data }).unwrap();
-      Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: lang === 'AZ' ? 'Komanda üzvü uğurla redaktə edildi.' : 'Team member successfully updated.',
-
-        timer: 2000,
-        showConfirmButton: true
-      });
+      notify.updated();
       refetch();
       onClose();
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error!',
-        text: error.data?.message || 'Failed to update team member',
-      });
+      notify.updateFailed(error.data?.message);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="form-container p-4 border rounded shadow-sm">
-  
+
       <div className="mb-3">
         <label className="form-label">{lang === 'AZ' ? 'Tam Ad' : 'Full Name'}</label>
-        <input 
-          name="fullname" 
-          value={formData.fullname} 
+        <input
+          name="fullname"
+          value={formData.fullname}
           onChange={handleChange}
-          className="form-control" 
-          required 
+          className="form-control"
+          required
         />
       </div>
-  
+
       <div className="row">
         <div className="col-md-6 mb-3">
           <label className="form-label">{lang === 'AZ' ? 'Vəzifə (AZ)' : 'Role (AZ)'}</label>
-          <input 
-            name="roleAze" 
-            value={formData.roleAze} 
+          <input
+            name="roleAze"
+            value={formData.roleAze}
             onChange={handleChange}
-            className="form-control" 
-            required 
+            className="form-control"
+            required
           />
         </div>
         <div className="col-md-6 mb-3">
           <label className="form-label">{lang === 'AZ' ? 'Vəzifə (EN)' : 'Role (EN)'}</label>
-          <input 
-            name="roleEng" 
-            value={formData.roleEng} 
+          <input
+            name="roleEng"
+            value={formData.roleEng}
             onChange={handleChange}
-            className="form-control" 
-            required 
+            className="form-control"
+            required
           />
         </div>
       </div>
-  
+
       <div className="mb-3">
         <label className="form-label">{lang === 'AZ' ? 'Profil Şəkli' : 'Profile Image'}</label>
-        <input 
-          type="file" 
-          onChange={handleFileChange} 
-          className="form-control" 
+        <input
+          type="file"
+          onChange={handleFileChange}
+          className="form-control"
         />
       </div>
-  
+
       <div className="d-flex justify-content-between mt-4">
-        <button 
-          type="submit" 
-          className="btn btn-primary" 
+        <button
+          type="submit"
+          className="btn btn-primary"
           disabled={isLoading}
         >
-          {isLoading ? 
-            (lang === 'AZ' ? 'Yenilənir...' : 'Updating...') : 
+          {isLoading ?
+            (lang === 'AZ' ? 'Yenilənir...' : 'Updating...') :
             (lang === 'AZ' ? 'Üzvü Yenilə' : 'Update Member')}
         </button>
-        <button 
-          type="button" 
-          className="btn btn-secondary" 
+        <button
+          type="button"
+          className="btn btn-secondary"
           onClick={onClose}
         >
           {lang === 'AZ' ? 'Ləğv et' : 'Cancel'}

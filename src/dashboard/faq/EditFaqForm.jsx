@@ -1,10 +1,10 @@
-import React, { useContext, useState, useEffect } from 'react';
-import Swal from 'sweetalert2';
+import { useContext, useState, useEffect } from 'react';
 import { useEditFaqMutation } from '../tools/api/faq';
 import { LangContext } from '../../context/LangContext';
+import { notify } from '../../hooks/useNotify';
 
-const EditFaqForm = ({ faq, onClose, refetch }) => {  
-    const { lang } = useContext(LangContext); 
+const EditFaqForm = ({ faq, onClose, refetch }) => {
+    const { lang } = useContext(LangContext);
     const [formData, setFormData] = useState({
         questionId: '',
         titleAze: '',
@@ -14,7 +14,6 @@ const EditFaqForm = ({ faq, onClose, refetch }) => {
     });
 
     const [editFaq, { isLoading }] = useEditFaqMutation();
-
 
     useEffect(() => {
         if (faq) {
@@ -30,9 +29,9 @@ const EditFaqForm = ({ faq, onClose, refetch }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({ 
-            ...formData, 
-            [name]: name === 'questionId' ? Number(value) : value 
+        setFormData({
+            ...formData,
+            [name]: name === 'questionId' ? Number(value) : value
         });
     };
 
@@ -40,36 +39,22 @@ const EditFaqForm = ({ faq, onClose, refetch }) => {
         e.preventDefault();
 
         if (!faq || !faq._id) {
-            Swal.fire({
-                icon: 'error',
-                title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-                text: lang === 'AZ' ? 'Yanlış FAQ məlumatı' : 'Invalid FAQ data',
-            });
+            notify.error('Yanlış FAQ məlumatı', 'Invalid FAQ data');
             return;
         }
 
         try {
-            await editFaq({ 
+            await editFaq({
                 id: faq._id,
                 ...formData
             }).unwrap();
 
-            Swal.fire({
-                icon: 'success',
-                title: lang === 'AZ' ? 'Uğur!' : 'Success!',
-                text: lang === 'AZ' ? 'FAQ uğurla yeniləndi.' : 'FAQ updated successfully!',
-                timer: 2000,
-                showConfirmButton: false
-            });
+            notify.updated();
             refetch();
             onClose();
         } catch (error) {
             console.error('Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-                text: error.data?.message || (lang === 'AZ' ? 'FAQ yenilənə bilmədi' : 'Failed to update FAQ'),
-            });
+            notify.updateFailed(error.data?.message);
         }
     };
 
@@ -77,13 +62,13 @@ const EditFaqForm = ({ faq, onClose, refetch }) => {
         <form onSubmit={handleSubmit} className="form-container p-4 border rounded">
             <div className="mb-3">
                 <label htmlFor="questionId" className="form-label">{lang === 'AZ' ? 'Sual ID' : 'Question ID'}</label>
-                <input 
-                    type="number" 
-                    id="questionId" 
-                    name="questionId" 
-                    className="form-control" 
-                    value={formData.questionId} 
-                    onChange={handleChange} 
+                <input
+                    type="number"
+                    id="questionId"
+                    name="questionId"
+                    className="form-control"
+                    value={formData.questionId}
+                    onChange={handleChange}
                     placeholder={lang === 'AZ' ? 'Sual ID daxil edin' : 'Enter question ID'}
                     required
                     min="1"
@@ -92,40 +77,40 @@ const EditFaqForm = ({ faq, onClose, refetch }) => {
 
             <div className="mb-3">
                 <label htmlFor="titleAze" className="form-label">{lang === 'AZ' ? 'Sual (Aze)' : 'Question (Aze)'}</label>
-                <input 
-                    type="text" 
-                    id="titleAze" 
-                    name="titleAze" 
-                    className="form-control" 
-                    value={formData.titleAze} 
-                    onChange={handleChange} 
+                <input
+                    type="text"
+                    id="titleAze"
+                    name="titleAze"
+                    className="form-control"
+                    value={formData.titleAze}
+                    onChange={handleChange}
                     placeholder={lang === 'AZ' ? 'Sualı Azərbaycan dilində daxil edin' : 'Enter question in Azerbaijani'}
-                    required 
+                    required
                 />
             </div>
-            
+
             <div className="mb-3">
                 <label htmlFor="titleEng" className="form-label">{lang === 'AZ' ? 'Sual (Eng)' : 'Question (Eng)'}</label>
-                <input 
-                    type="text" 
-                    id="titleEng" 
-                    name="titleEng" 
-                    className="form-control" 
-                    value={formData.titleEng} 
-                    onChange={handleChange} 
+                <input
+                    type="text"
+                    id="titleEng"
+                    name="titleEng"
+                    className="form-control"
+                    value={formData.titleEng}
+                    onChange={handleChange}
                     placeholder={lang === 'AZ' ? 'Sualı İngilis dilində daxil edin' : 'Enter question in English'}
-                    required 
+                    required
                 />
             </div>
 
             <div className="mb-3">
                 <label htmlFor="descriptionAze" className="form-label">{lang === 'AZ' ? 'Cavab (Aze)' : 'Answer (Aze)'}</label>
                 <textarea
-                    id="descriptionAze" 
-                    name="descriptionAze" 
-                    className="form-control" 
-                    value={formData.descriptionAze} 
-                    onChange={handleChange} 
+                    id="descriptionAze"
+                    name="descriptionAze"
+                    className="form-control"
+                    value={formData.descriptionAze}
+                    onChange={handleChange}
                     placeholder={lang === 'AZ' ? 'Cavabı Azərbaycan dilində daxil edin' : 'Enter answer in Azerbaijani'}
                     required
                     rows={3}
@@ -135,11 +120,11 @@ const EditFaqForm = ({ faq, onClose, refetch }) => {
             <div className="mb-3">
                 <label htmlFor="descriptionEng" className="form-label">{lang === 'AZ' ? 'Cavab (Eng)' : 'Answer (Eng)'}</label>
                 <textarea
-                    id="descriptionEng" 
-                    name="descriptionEng" 
-                    className="form-control" 
-                    value={formData.descriptionEng} 
-                    onChange={handleChange} 
+                    id="descriptionEng"
+                    name="descriptionEng"
+                    className="form-control"
+                    value={formData.descriptionEng}
+                    onChange={handleChange}
                     placeholder={lang === 'AZ' ? 'Cavabı İngilis dilində daxil edin' : 'Enter answer in English'}
                     required
                     rows={3}

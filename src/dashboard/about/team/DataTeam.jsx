@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import { useContext } from 'react';
+
 import EditTeamForm from './EditTeamForm';
 import { useDeleteTeamMemberMutation } from '../../tools/api/about-team';
-import Swal from 'sweetalert2';
-import { useContext } from 'react';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
 const DataTeam = ({ teamMembers, refetch }) => {
   const { lang } = useContext(LangContext)
@@ -11,26 +12,7 @@ const DataTeam = ({ teamMembers, refetch }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [deleteTeamMember, { isLoading: isDeleting }] = useDeleteTeamMemberMutation();
 
-  const handleDelete = async (id) => {
-    Swal.fire({
-      title: 'Delete Team Member?',
-      text: "This action cannot be undone!",
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Delete',
-      cancelButtonText: 'Cancel'
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await deleteTeamMember(id).unwrap();
-          Swal.fire('Deleted!', 'Team member deleted successfully!', 'success');
-          refetch();
-        } catch (error) {
-          Swal.fire('Error!', error.data?.message || 'Failed to delete team member.', 'error');
-        }
-      }
-    });
-  };
+  const handleDelete = (id) => notify.deleteItem(() => deleteTeamMember(id).unwrap(), refetch);
 
   return (
     <div className="dashboard-container">
@@ -81,10 +63,10 @@ const DataTeam = ({ teamMembers, refetch }) => {
           <div key={item._id} className="dashboard-card">
             <div className="d-flex justify-content-center py-3">
               <img
-                src={`https://playhost-backend-production.up.railway.app/${item.teamImage}`}
+                src={`http://localhost:3333/${item.teamImage}`}
                 alt={item.fullname}
                 className="dashboard-image"
-                style={{ height: '200px', transition:'all .3s ease', borderRadius:'20px' }}
+                style={{ height: '200px', transition: 'all .3s ease', borderRadius: '20px' }}
 
                 onError={(e) => {
                   e.target.src = 'https://www.mountainmotorvehicles.co.uk/wp-content/uploads/2024/05/No-image-available-2.jpg';

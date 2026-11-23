@@ -1,4 +1,4 @@
-@mixin section ($include-span: false){
+@mixin section ($include-span: false) {
     background-color: var(--bg-color);
     padding: 5% 2%;
     display: flex;
@@ -6,10 +6,10 @@
 
     @if $include-span {
         span {
-          @include span;
-          background-color: transparent;
+            @include span;
+            background-color: transparent;
         }
-      }
+    }
 
     h1 {
         @include h1;
@@ -20,7 +20,7 @@
     }
 
     @media (max-width:700px) {
-        h1{
+        h1 {
             font-size: 40px;
         }
     }
@@ -42,8 +42,9 @@
     border: 2px solid rgba(255, 255, 255, 0.25);
     border-radius: 24px;
     font-weight: bold;
-    padding: 5px 15px;
+    padding: 10px 15px;
     margin-bottom: 16px;
+    line-height: 100%;
 }
 
 @mixin h1 {
@@ -55,10 +56,17 @@
     padding-top: 20px;
 }
 
+@mixin d-flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
 @mixin purple-btn($background-color: linear-gradient(to right, #5623d8, #6a79fa)) {
     background: $background-color;
     width: max-content;
-    padding: 7px 20px;
+    padding: 13px 20px 10px;
     border-radius: 5px;
     border: none;
     color: #fff;
@@ -66,6 +74,8 @@
     font-weight: bold;
     font-family: $font-Oxanium;
     transition: all .3s ease;
+    line-height: 100%;
+    @include d-flex;
 
     &:hover {
         transform: scale(1.1);
@@ -89,11 +99,4 @@
         color: #fff;
     }
 
-}
-
-@mixin d-flex {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
 }

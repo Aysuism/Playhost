@@ -1,20 +1,13 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from '../../../app';
 
 export const settingsApi = createApi({
   reducerPath: 'settingsApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://playhost-backend-production.up.railway.app/' }),
+  baseQuery,
   endpoints: (builder) => ({
     getSettings: builder.query({
       query: () => '/generalsettings',
       providesTags: ['Settings'],
-    }),
-    addSettings: builder.mutation({
-      query: (formData) => ({
-        url: '/ad/generalsettings/generalsettings',
-        method: 'POST',
-        body: formData,
-      }),
-      invalidatesTags: ['Settings'],
     }),
     editSettings: builder.mutation({
       query: ({ id, formData }) => ({
@@ -24,19 +17,10 @@ export const settingsApi = createApi({
       }),
       invalidatesTags: ['Settings'],
     }),
-    deleteSettings: builder.mutation({
-      query: (id) => ({
-        url: `/ad/generalsettings/generalsettings/${id}`,
-        method: 'DELETE',
-      }),
-      invalidatesTags: ['Settings'],
-    }),
   }),
 });
 
 export const {
   useGetSettingsQuery,
-  useAddSettingsMutation,
   useEditSettingsMutation,
-  useDeleteSettingsMutation,
 } = settingsApi;

@@ -1,14 +1,11 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import EditSettingForm from './EditSettingForm';
-import { useDeleteSettingsMutation } from '../tools/api/settings';
-import Swal from 'sweetalert2';
 import { LangContext } from '../../context/LangContext';
 
 const DataSetting = ({ settings, refetch, isLoading, isError }) => {
     const { lang } = useContext(LangContext);
     const [editingSetting, setEditingSetting] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
-    // const [deleteSettings] = useDeleteSettingsMutation();
 
     return (
         <div className="dashboard-container">
@@ -50,38 +47,27 @@ const DataSetting = ({ settings, refetch, isLoading, isError }) => {
 
             {/* Settings Grid */}
             <div className="dashboard-grid d-flex">
-                {settings.map((item) => {
-                    const logoUrl = item.logo?.[0]
-                        ? `https://playhost-backend-production.up.railway.app/${item.logo[0].replace(/\\/g, '/')}`
-                        : null;
 
-                    // const faviconUrl = item.favIcon?.[0]
-                    //     ? `https://playhost-backend-production.up.railway.app/${item.favIcon[0].replace(/\\/g, '/')}`
-                    //     : null;
+                <div className="dashboard-card">
 
-                    return (
-                        <div key={item._id} className="dashboard-card">
+                    <div className="dashboard-content">
+                        <div className="dashboard-description">
+                            <div className="description-item">
+                                <span className="description-label">
+                                    {lang === 'AZ' ? 'Açıqlama (EN):' : 'Description (EN):'}
+                                </span>
+                                <p>{settings?.descriptionEng}</p>
+                            </div>
+                            <div className="description-item">
+                                <span className="description-label">
+                                    {lang === 'AZ' ? 'Açıqlama (AZ):' : 'Description (AZ):'}
+                                </span>
+                                <p>{settings?.descriptionAze}</p>
+                            </div>
+                        </div>
 
-                            <div className="dashboard-content">
-                                <h3 className="dashboard-heading">(Az){item.titleAze} / (En){item.titleEng}</h3>
-
-                                <div className="dashboard-description">
-                                    <div className="description-item">
-                                        <span className="description-label">
-                                            {lang === 'AZ' ? 'Açıqlama (EN):' : 'Description (EN):'}
-                                        </span>
-                                        <p>{item.descriptionEng}</p>
-                                    </div>
-                                    <div className="description-item">
-                                        <span className="description-label">
-                                            {lang === 'AZ' ? 'Açıqlama (AZ):' : 'Description (AZ):'}
-                                        </span>
-                                        <p>{item.descriptionAze}</p>
-                                    </div>
-                                </div>
-
-                                <div className="dashboard-meta flex-column">
-                                    {/* {faviconUrl && (
+                        <div className="dashboard-meta flex-column">
+                            {/* {faviconUrl && (
                                         <div className="meta-item">
                                             <span className="meta-label">Favicon:</span>
                                             <img
@@ -90,53 +76,53 @@ const DataSetting = ({ settings, refetch, isLoading, isError }) => {
                                             />
                                         </div>
                                     )} */}
-                                    {logoUrl && (
-                                        <div className="meta-item">
-                                            <span className="meta-label">Logo:</span>
-                                            <img
-                                                src={logoUrl}
-                                                alt="logo"
-                                            />
-                                        </div>
-                                    )}
-                                    <div className="meta-item">
-                                        <span className="meta-label">Facebook:</span>
-                                        <span className="meta-value">{item.socialMedia.facebookBtnUrl}</span>
-                                    </div>
-                                    <div className="meta-item">
-                                        <span className="meta-label">Twitter:</span>
-                                        <span className="meta-value">{item.socialMedia.twitterBtnUrl}</span>
-                                    </div>
-                                    <div className="meta-item">
-                                        <span className="meta-label">Instagram:</span>
-                                        <span className="meta-value">{item.socialMedia.instagramBtnUrl}</span>
-                                    </div>
-                                    <div className="meta-item">
-                                        <span className="meta-label">TikTok:</span>
-                                        <span className="meta-value">{item.socialMedia.tikTokBtnUrl}</span>
-                                    </div>
-                                    <div className="meta-item">
-                                        <span className="meta-label">Discord:</span>
-                                        <span className="meta-value">{item.socialMedia.whatsappBtnUrl}</span>
-                                    </div>
+                            {settings?.logo && (
+                                <div className="meta-item">
+                                    <span className="meta-label">Logo:</span>
+                                    <img
+                                        src={settings?.logo?.[0]
+                                            ? `http://localhost:3333/${settings?.logo[0].replace(/\\/g, '/')}`
+                                            : null}
+                                        alt="logo"
+                                    />
                                 </div>
-
-                                <div className="dashboard-actions" style={{display:'inline-block',}}>
-                                    <button
-                                        type="button"
-                                        className="btn btn-edit"
-                                        onClick={() => {
-                                            setEditingSetting(item);
-                                            setShowEditModal(true);
-                                        }}
-                                    >
-                                       {lang==='AZ'?'Redaktə Et':'Edit'}
-                                    </button>
-                                </div>
+                            )}
+                            <div className="meta-item">
+                                <span className="meta-label">Facebook:</span>
+                                <span className="meta-value">{settings?.socialMedia?.facebookBtnUrl}</span>
+                            </div>
+                            <div className="meta-item">
+                                <span className="meta-label">Twitter:</span>
+                                <span className="meta-value">{settings?.socialMedia?.twitterBtnUrl}</span>
+                            </div>
+                            <div className="meta-item">
+                                <span className="meta-label">Instagram:</span>
+                                <span className="meta-value">{settings?.socialMedia?.instagramBtnUrl}</span>
+                            </div>
+                            <div className="meta-item">
+                                <span className="meta-label">TikTok:</span>
+                                <span className="meta-value">{settings?.socialMedia?.tikTokBtnUrl}</span>
+                            </div>
+                            <div className="meta-item">
+                                <span className="meta-label">Discord:</span>
+                                <span className="meta-value">{settings?.socialMedia?.whatsappBtnUrl}</span>
                             </div>
                         </div>
-                    );
-                })}
+
+                        <div className="dashboard-actions" style={{ display: 'inline-block', }}>
+                            <button
+                                type="button"
+                                className="btn btn-edit"
+                                onClick={() => {
+                                    setEditingSetting(settings);
+                                    setShowEditModal(true);
+                                }}
+                            >
+                                {lang === 'AZ' ? 'Redaktə Et' : 'Edit'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

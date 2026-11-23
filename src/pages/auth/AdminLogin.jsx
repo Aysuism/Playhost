@@ -1,35 +1,43 @@
+import { useDispatch } from 'react-redux';
 import { useState, useContext } from 'react';
-import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 import { LangContext } from '../../context/LangContext';
+import { setCredentials } from '../../dashboard/tools/api/auth-slice';
+import { notify } from '../../hooks/useNotify';
+import { apiFetch } from '../../app';
+
 const AdminLogin = () => {
-  const { lang } = useContext(LangContext); // Access lang context
+  const { lang } = useContext(LangContext);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({ email: '', password: '' });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    if (formData.email === 'admin@blabla.com' && formData.password === 'admin123') {
-      // Clear any existing user data (optional, but recommended)
-      localStorage.removeItem('loggedInUser'); 
-  
-      const adminUser = {
-        username: 'Admin',
-        email: formData.email,
-        role: 'admin'
-      };
-  
-      localStorage.setItem('loggedInUser', JSON.stringify(adminUser));
-      localStorage.setItem('adminAccess', 'true'); // Grant admin access
-  
-      window.location.href = '/dashboard';
-    } else {
-      Swal.fire({
-        title: lang === 'AZ' ? 'Xəta' : 'Error',
-        text: lang === 'AZ' ? 'Yanlış məlumatlar' : 'Invalid credentials',
-        icon: 'error',
-        confirmButtonText: 'OK'
+
+    try {
+      const res = await apiFetch('auth/login', {
+        method: 'POST',
+        body: JSON.stringify(formData),
       });
+
+      if (!res.ok) {
+        notify.error('Yanlış Email və ya Şifrə', 'Incorrect Email or Password', await res.text());
+        return;
+      }
+
+      const { token, user } = await res.json();
+
+      if (user.role !== 'admin') {
+        notify.error('Admin hüququnuz yoxdur', 'You are not an admin');
+        return;
+      }
+
+      dispatch(setCredentials({ token, user }));
+      navigate('/dashboard');
+    } catch (err) {
+      notify.error('Server ilə əlaqə yoxdur', 'Cannot reach the server');
     }
   };
 

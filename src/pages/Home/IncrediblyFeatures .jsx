@@ -2,6 +2,7 @@ import React from 'react';
 import { useContext } from 'react';
 import { LangContext } from '../../context/LangContext';
 import { useGetServiceQuery } from '../../dashboard/tools/api/home-service';
+import { BASE_URL } from '../../app';
 
 const IncrediblyFeatures = () => {
   const { lang } = useContext(LangContext);
@@ -16,7 +17,7 @@ const IncrediblyFeatures = () => {
           {services.map((item) => (
             <div key={item._id} className="col-lg-3 col-md-6 col-sm-12" data-aos="fade-up">
               <div className="features">
-                <img src={`https://playhost-backend-production.up.railway.app/${item.iconUrl}`} alt="service-icon" />
+                <img src={BASE_URL + item.iconUrl} alt="service-icon" />
                 <h4>{lang === 'Az' ? item.titleAze : item.titleEng}</h4>
                 <p>{lang === 'Az' ? item.descriptionAze : item.descriptionEng}</p>
               </div>

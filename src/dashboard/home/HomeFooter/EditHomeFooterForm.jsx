@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useEditHomeFooterMutation } from '../../tools/api/home-footer';
-import Swal from 'sweetalert2';
-import { useContext } from 'react';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
 const EditHomeFooterForm = ({ footer, onClose, refetch }) => {
   const { lang } = useContext(LangContext)
@@ -46,23 +45,13 @@ const EditHomeFooterForm = ({ footer, onClose, refetch }) => {
     }
 
     try {
-      await editFooter({ id: footer._id, formData: data }).unwrap();
-      Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: 'Footer updated successfully!',
-        timer: 2000,
-        showConfirmButton: true
-      });
+      await editFooter(data).unwrap();
+      notify.updated();
       refetch();
       onClose();
     } catch (error) {
       console.error('Error:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error!',
-        text: error.data?.message || 'Failed to update footer',
-      });
+      notify.updateFailed(error.data?.message);
     }
   };
 

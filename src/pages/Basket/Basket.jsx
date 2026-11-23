@@ -7,9 +7,11 @@ import { FaRegTrashAlt } from 'react-icons/fa'
 import { BsCart4 } from 'react-icons/bs'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../../app'
+import { useServerCart } from '../../hooks/useServerCart'
 
 const Basket = ({ isOpen, togglePanel }) => {
-  const { isEmpty, items, updateItemQuantity, removeItem, cartTotal, emptyCart } = useCart()
+  const { isEmpty, items, updateItemQuantity, removeItem, cartTotal, emptyCart } = useServerCart()
   const { lang } = useContext(LangContext)
   const navigate = useNavigate();
 
@@ -38,11 +40,11 @@ const Basket = ({ isOpen, togglePanel }) => {
 
 
           < div className="container p-0">
-            {items.map((item, count) => (
-              <div className="cart-item" key={count}>
+            {items.map((item) => (
+              <div className="cart-item" key={item.id}>
                 <div className="row">
                   <div className="col-md-4 col-sm-4">
-                    <img src={`https://playhost-backend-production.up.railway.app/${item.imageUrl}`} alt="" />
+                    <img src={BASE_URL + item.imageUrl?.[0]} alt={item.gameName} />
                   </div>
                   <div className="col-md-8 col-sm-8">
                     <div className="text">
@@ -61,17 +63,20 @@ const Basket = ({ isOpen, togglePanel }) => {
             ))}
             <div className="total">
               <h3>{lang === "AZ" ? "Yekun Qiymət" : "Total price:"} ${Math.round(cartTotal)}</h3>
-              <button
-                className="checkout-btn"
-                onClick={() => {
-                  togglePanel();
-                  navigate('/checkout');
-                }}
-              >
-                {lang === "AZ" ? "Ödənişə Keç" : "Check Out"}
-              </button>
+              <div className='buttons'>
+                <button
+                  className="checkout-btn"
+                  onClick={() => {
+                    togglePanel();
+                    navigate('/checkout');
+                  }}
+                >
+                  {lang === "AZ" ? "Ödənişə Keç" : "Check Out"}
+                </button>
 
-              <button className='emptyall' onClick={emptyCart}>{lang === "AZ" ? "Səbəti Boşalt" : "Clear all"}</button>
+                <button className='emptyall' onClick={emptyCart}>{lang === "AZ" ? "Səbəti Boşalt" : "Clear all"}</button>
+
+              </div>
             </div>
           </div>
         }

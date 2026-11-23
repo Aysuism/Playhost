@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import Swal from 'sweetalert2';
+import { useState, useContext } from 'react';
 import { useAddServiceMutation } from '../../tools/api/home-service';
-import { useContext } from 'react';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
 const AddServiceForm = ({ refetch, onClose }) => {
   const { lang } = useContext(LangContext);
@@ -33,12 +32,7 @@ const AddServiceForm = ({ refetch, onClose }) => {
     e.preventDefault();
 
     if (!formData.iconUrl) {
-      Swal.fire({
-        icon: 'error',
-        title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-        text: lang === 'AZ' ? 'Zəhmət olmasa ikon seçin' : 'Please select an icon',
-        confirmButtonText: 'OK',
-      });
+      notify.error('Zəhmət olmasa ikon seçin', 'Please select an icon');
       return;
     }
 
@@ -52,14 +46,7 @@ const AddServiceForm = ({ refetch, onClose }) => {
     try {
       await addService(data).unwrap();
 
-      Swal.fire({
-        icon: 'success',
-        title: lang === 'AZ' ? 'Uğurlu!' : 'Success!',
-        text: lang === 'AZ'
-          ? 'Xidmət uğurla əlavə edildi.'
-          : 'Service successfully added.',
-        confirmButtonText: 'OK',
-      });
+      notify.added();
 
       setFormData({
         titleAze: '',
@@ -71,18 +58,9 @@ const AddServiceForm = ({ refetch, onClose }) => {
 
       refetch();
       onClose();
-
     } catch (err) {
       console.error('Error:', err);
-
-      Swal.fire({
-        icon: 'error',
-        title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-        text: lang === 'AZ'
-          ? 'Xəta baş verdi, zəhmət olmasa yenidən cəhd edin.'
-          : 'Something went wrong, please try again.',
-        confirmButtonText: 'OK',
-      });
+      notify.addFailed(err.data?.message);
     }
   };
 

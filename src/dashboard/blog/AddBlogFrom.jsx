@@ -1,7 +1,7 @@
-import React, { useState, useContext } from 'react';
-import Swal from 'sweetalert2';
+import { useState, useContext } from 'react';
 import { useAddBlogMutation } from '../tools/api/blog';
 import { LangContext } from '../../context/LangContext';
+import { notify } from '../../hooks/useNotify';
 
 const AddBlogForm = ({ refetch, onClose }) => {
   const { lang } = useContext(LangContext);
@@ -31,12 +31,7 @@ const AddBlogForm = ({ refetch, onClose }) => {
     e.preventDefault();
 
     if (!formData.imageUrl) {
-      Swal.fire({
-        icon: 'error',
-        title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-        text: lang === 'AZ' ? 'Zəhmət olmasa şəkil seçin' : 'Please select an image',
-        confirmButtonText: 'OK',
-      });
+      notify.error('Zəhmət olmasa şəkil seçin', 'Please select an image');
       return;
     }
 
@@ -49,12 +44,7 @@ const AddBlogForm = ({ refetch, onClose }) => {
 
     try {
       await addBlog(data).unwrap();
-      Swal.fire({
-        icon: 'success',
-        title: lang === 'AZ' ? 'Uğurlu!' : 'Success!',
-        text: lang === 'AZ' ? 'Bloq əlavə olundu.' : 'Blog successfully added.',
-        confirmButtonText: 'OK',
-      });
+      notify.added();
       setFormData({
         titleAze: '',
         titleEng: '',
@@ -65,12 +55,7 @@ const AddBlogForm = ({ refetch, onClose }) => {
       refetch();
       onClose();
     } catch (err) {
-      Swal.fire({
-        icon: 'error',
-        title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-        text: lang === 'AZ' ? 'Bir xəta baş verdi, yenidən cəhd edin.' : 'Something went wrong, please try again.',
-        confirmButtonText: 'OK',
-      });
+      notify.addFailed(err.data?.message);
     }
   };
 

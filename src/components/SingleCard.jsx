@@ -1,72 +1,45 @@
-import React from 'react';
-import { IoStarSharp } from "react-icons/io5";
-import { Link } from 'react-router-dom';
-import slugify from 'slugify';
 import { useContext } from 'react';
+import { Link } from 'react-router-dom';
+
+import { useServerWishlist } from '../hooks/useServerWishlist';
+import { useServerCart } from '../hooks/useServerCart';
 import { LangContext } from '../context/LangContext';
-import { useCart } from 'react-use-cart';
-import Swal from 'sweetalert2';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
-import { useWishlist } from 'react-use-wishlist';
+import { IoStarSharp } from "react-icons/io5";
+import slugify from 'slugify';
+import { notify } from '../hooks/useNotify';
 
 const SingleCard = ({ alldata }) => {
   const { lang } = useContext(LangContext);
-  const { addItem } = useCart();
-  const { addWishlistItem, removeWishlistItem, inWishlist } = useWishlist();
+  const { addWishlistItem, removeWishlistItem, inWishlist, isAuthenticated } = useServerWishlist();
+  const { addItem } = useServerCart();
 
   //--------------------- Basket
-  const basketItem = {
-    id: alldata._id,
-    price: alldata.discountIndicator ? alldata.discountedPrice : alldata.originalPrice,
-    ...alldata
-  };
-
-  const addToCart = () => {
-    addItem(basketItem);
-    Swal.fire({
-      title: lang === "AZ" ? "Məhsul əlavə edildi" : "Product added",
-      icon: "success"
-    });
+  const addToCart = async () => {
+    const ok = await addItem(alldata);
+    if (ok) {
+      notify.success('Məhsul əlavə edildi', 'Product added');
+    }
   };
 
   //--------------------- Wishlist
-  const wishlistItem = {
-    id: alldata._id,
-    price: alldata.discountIndicator ? alldata.discountedPrice : alldata.originalPrice,
-    ...alldata
-  };
-
-  const toggleWishlist = () => {
-    const user = JSON.parse(localStorage.getItem('loggedInUser'));
-
-    if (!user) {
-      Swal.fire({
-        title: lang === "AZ" ? "Daxil olmalısınız" : "Login Required",
-        text: lang === "AZ" ? "İstək siyahısına əlavə etmək üçün daxil olun" : "Please login to add to wishlist",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: lang === "AZ" ? "Daxil ol" : "Login",
-        cancelButtonText: lang === "AZ" ? "Ləğv et" : "Cancel"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.location.href = '/auth/login';
-        }
-      });
+  const toggleWishlist = async () => {
+    if (!isAuthenticated) {
+      const ok = await notify.confirmLogin('İstək siyahısına əlavə etmək üçün daxil olun', 'Please login to add to wishlist');
+      if (ok) window.location.href = '/auth/login';
       return;
     }
 
-    if (inWishlist(wishlistItem.id)) {
-      removeWishlistItem(wishlistItem.id);
-      Swal.fire({
-        title: lang === "AZ" ? "İstək siyahısından çıxarıldı" : "Removed from Wishlist",
-        icon: "warning"
-      });
-    } else {
-      addWishlistItem(wishlistItem);
-      Swal.fire({
-        title: lang === "AZ" ? "İstək siyahısına əlavə edildi" : "Added to Wishlist",
-        icon: "success"
-      });
+    try {
+      if (inWishlist(alldata._id)) {
+        await removeWishlistItem(alldata._id);
+        notify.info('İstək siyahısından çıxarıldı', 'Removed from Wishlist');
+      } else {
+        await addWishlistItem(alldata._id);
+        notify.success('İstək siyahısına əlavə edildi', 'Added to Wishlist');
+      }
+    } catch (error) {
+      notify.error('Xəta baş verdi', 'Something went wrong');
     }
   };
 
@@ -99,10 +72,10 @@ const SingleCard = ({ alldata }) => {
   return (
     <div data-aos="fade-up" className="col-lg-3 col-md-6 col-sm-12">
       <div className="box">
-        <img src={`https://playhost-backend-production.up.railway.app/${alldata.imageUrl[0]}`} alt={alldata.gameName} />
+        <img src={`http://localhost:3333/${alldata.imageUrl[0]}`} alt={alldata.gameName} />
 
         <button className="wishlist-btn" onClick={toggleWishlist}>
-          {inWishlist(wishlistItem.id) ? (
+          {inWishlist(alldata._id) ? (
             <FaHeart className="heart-icon filled" />
           ) : (
             <FaRegHeart className="heart-icon" />

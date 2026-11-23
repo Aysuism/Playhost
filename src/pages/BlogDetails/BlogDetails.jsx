@@ -13,6 +13,7 @@ import { FaStumbleupon } from "react-icons/fa";
 import { FaDelicious } from "react-icons/fa";
 import { FaTiktok } from "react-icons/fa";
 import { useGetBlogsQuery } from "../../dashboard/tools/api/blog";
+import { BASE_URL } from "../../app";
 
 const BlogDetails = () => {
     const { data: blogs=[] } = useGetBlogsQuery()
@@ -32,7 +33,7 @@ const BlogDetails = () => {
                     <div className="row">
                         <div className="col-lg-8 col-md-12 col-sm-12">
                             <div className="about-blog">
-                                <img src={`https://playhost-backend-production.up.railway.app/${findBlog.imageUrl}`} alt={lang === 'AZ' ? findBlog.titleAze : findBlog.titleEng} />
+                                <img src={BASE_URL + findBlog.imageUrl} alt={lang === 'AZ' ? findBlog.titleAze : findBlog.titleEng} />
                                 <p>{lang === "AZ" ? findBlog.descriptionAze : findBlog.descriptionEng}</p>
                             </div>
                             <CommentSection />

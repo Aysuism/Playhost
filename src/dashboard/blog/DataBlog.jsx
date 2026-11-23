@@ -1,8 +1,8 @@
-import React, { useState, useContext } from 'react';
-import Swal from 'sweetalert2';
+import { useState, useContext } from 'react';
 import { useDeleteBlogMutation } from '../tools/api/blog';
 import EditBlogForm from './EditBlogForm';
 import { LangContext } from '../../context/LangContext';
+import { notify } from '../../hooks/useNotify';
 
 const DataBlog = ({ blogs, refetch }) => {
   const { lang } = useContext(LangContext);
@@ -10,26 +10,7 @@ const DataBlog = ({ blogs, refetch }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [deleteBlog, { isLoading: isDeleting }] = useDeleteBlogMutation();
 
-  const handleDelete = async (id) => {
-    const result = await Swal.fire({
-      title: lang === 'AZ' ? 'Bloqu silmək?' : 'Delete Blog?',
-      text: lang === 'AZ' ? 'Bu əməliyyat geri alına bilməz!' : 'This action cannot be undone!',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: lang === 'AZ' ? 'Sil' : 'Delete',
-      cancelButtonText: lang === 'AZ' ? 'İmtina et' : 'Cancel',
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await deleteBlog(id).unwrap();
-        Swal.fire(lang === 'AZ' ? 'Silindi!' : 'Deleted!', lang === 'AZ' ? 'Bloq uğurla silindi!' : 'Blog deleted successfully!', 'success');
-        refetch();
-      } catch (error) {
-        Swal.fire(lang === 'AZ' ? 'Xəta!' : 'Error!', lang === 'AZ' ? 'Bloqu silmək mümkün olmadı.' : 'Failed to delete blog.', 'error');
-      }
-    }
-  };
+  const handleDelete = (id) => notify.deleteItem(() => deleteBlog(id).unwrap(), refetch);
 
   return (
     <div className="dashboard-container">
@@ -71,7 +52,7 @@ const DataBlog = ({ blogs, refetch }) => {
       <div className="dashboard-grid">
         {blogs.map((item) => {
           const image = item.imageUrl
-            ? `https://playhost-backend-production.up.railway.app/${item.imageUrl.replace(/\\/g, '/')}`
+            ? `http://localhost:3333/${item.imageUrl.replace(/\\/g, '/')}`
             : null;
 
           return (

@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useAddGameMutation } from '../../tools/api/games';
+import { useState, useEffect, useContext } from 'react';
 import { useGetCategoryQuery } from '../../tools/api/games-category';
-import Swal from 'sweetalert2';
+import { useAddGameMutation } from '../../tools/api/games';
 import { LangContext } from '../../../context/LangContext';
-import { useContext } from 'react';
+import { notify } from '../../../hooks/useNotify';
 
 const baseFlagUrl = 'https://www.designesia.com/themes/playhost/images/flags';
 
@@ -29,7 +28,6 @@ const AddGamesForm = ({ refetch, onClose }) => {
   const [addGame, { isLoading }] = useAddGameMutation();
 
   const [formData, setFormData] = useState({
-    gameId: 1,
     gameName: '',
     gameCategory: '',
     originalPrice: 0,
@@ -37,7 +35,6 @@ const AddGamesForm = ({ refetch, onClose }) => {
     discount: 0,
     discountedPrice: 0,
     rating: 0,
-    reviews: 0,
     slot: 0,
     duration: 1,
     location: [{
@@ -99,19 +96,19 @@ const AddGamesForm = ({ refetch, onClose }) => {
     e.preventDefault();
 
     if (!formData.imageUrl) {
-      Swal.fire({ icon: 'error', title: 'Error!', text: lang === 'AZ' ? 'Zəhmət olmasa oyun şəkli seçin' : 'Please select a game image' });
+      notify.error('Zəhmət olmasa oyun şəkli seçin', 'Please select a game image');
       return;
     }
 
     if (!formData.gameCategory) {
-      Swal.fire({ icon: 'error', title: 'Error!', text: lang === 'AZ' ? 'Zəhmət olmasa kateqoriya seçin' : 'Please select a category' });
+      notify.error('Zəhmət olmasa kateqoriya seçin', 'Please select a category');
       return;
     }
 
     const data = new FormData();
     const fields = [
-      'gameId', 'gameName', 'originalPrice', 'discountIndicator', 'discount',
-      'discountedPrice', 'rating', 'reviews', 'slot', 'duration', 'gameCategory'
+      'gameName', 'originalPrice', 'discountIndicator', 'discount',
+      'discountedPrice', 'rating', 'slot', 'duration', 'gameCategory'
     ];
 
     fields.forEach(field => formData[field] !== undefined && data.append(field, formData[field]));
@@ -128,36 +125,19 @@ const AddGamesForm = ({ refetch, onClose }) => {
 
     try {
       await addGame(data).unwrap();
-      Swal.fire({
-        icon: 'success',
-        title: lang === 'AZ' ? 'Uğurla əlavə olundu!' : 'Success!',
-        text: lang === 'AZ' ? 'Oyun uğurla əlavə olundu!' : 'Game added successfully!',
-        timer: 2000,
-        showConfirmButton: true
-      });
+      notify.added();
       refetch();
       onClose();
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-        text: error.data?.message || (lang === 'AZ' ? 'Oyunu əlavə etmək mümkün olmadı' : 'Failed to add game'),
-      });
+      notify.addFailed(error.data?.message);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="form-container p-4 p-md-5 rounded shadow-sm">
       <div className="row g-4">
-
-        {/* Game ID */}
-        <div className="col-md-6">
-          <label className="form-label">{lang === 'AZ' ? 'Oyun ID*' : 'Game ID*'}</label>
-          <input type="number" name="gameId" className="form-control" value={formData.gameId} onChange={handleChange} required />
-        </div>
-
         {/* Game Name */}
-        <div className="col-md-6">
+        <div className="col-md-12 mt-0">
           <label className="form-label">{lang === 'AZ' ? 'Oyun Adı*' : 'Game Name*'}</label>
           <input type="text" name="gameName" className="form-control" value={formData.gameName} onChange={handleChange} required />
         </div>
@@ -227,12 +207,6 @@ const AddGamesForm = ({ refetch, onClose }) => {
             <option value="4">{lang === 'AZ' ? '4 - Yaxşı' : '4 - Good'}</option>
             <option value="5">{lang === 'AZ' ? '5 - Əla' : '5 - Excellent'}</option>
           </select>
-        </div>
-
-        {/* Reviews */}
-        <div className="col-md-6">
-          <label className="form-label">{lang === 'AZ' ? 'Rəy Sayı' : 'Number of Reviews'}</label>
-          <input type="number" name="reviews" min="0" className="form-control" value={formData.reviews} onChange={handleChange} />
         </div>
 
         {/* Slots */}

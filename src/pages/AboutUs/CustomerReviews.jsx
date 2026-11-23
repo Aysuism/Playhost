@@ -37,7 +37,7 @@ const CustomerReviews = () => {
         <section
             className="customer-reviews"
         >
-            <div className="container">
+            <div className="container-fluid">
                 <div className="row">
                     <Swiper
                         slidesPerView={1}
@@ -86,7 +86,7 @@ const CustomerReviews = () => {
                                     </div>
                                     <div className="comment-header">
                                         <img
-                                            src={`https://playhost-backend-production.up.railway.app/${item.avatarUrl}`}
+                                            src={`http://localhost:3333/${item.avatarUrl}`}
                                             alt="User Avatar"
                                             style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px' }}
                                         />

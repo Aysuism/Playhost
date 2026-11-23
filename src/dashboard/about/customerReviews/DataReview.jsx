@@ -3,9 +3,9 @@ import { FaStar } from "react-icons/fa";
 import { FaRegStar } from "react-icons/fa";
 import EditReviewForm from './EditReviewForm';
 import { useDeleteReviewMutation } from '../../tools/api/about-review';
-import Swal from 'sweetalert2';
 import { useContext } from 'react';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
 const DataReview = ({ reviews, refetch }) => {
   const { lang } = useContext(LangContext)
@@ -13,26 +13,7 @@ const DataReview = ({ reviews, refetch }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [deleteReview, { isLoading: isDeleting }] = useDeleteReviewMutation();
 
-  const handleDelete = async (id) => {
-    Swal.fire({
-      title: 'Delete Review?',
-      text: "This action cannot be undone!",
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Delete',
-      cancelButtonText: 'Cancel'
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await deleteReview(id).unwrap();
-          Swal.fire('Deleted!', 'Review deleted successfully!', 'success');
-          refetch();
-        } catch (error) {
-          Swal.fire('Error!', error.data?.message || 'Failed to delete review.', 'error');
-        }
-      }
-    });
-  };
+  const handleDelete = (id) => notify.deleteItem(() => deleteReview(id).unwrap(), refetch);
 
   return (
     <div className="dashboard-container">
@@ -79,7 +60,7 @@ const DataReview = ({ reviews, refetch }) => {
       <div className="dashboard-grid">
         {reviews?.map((item) => {
           const avatarUrl = item.avatarUrl
-            ? `https://playhost-backend-production.up.railway.app/${item.avatarUrl.replace(/\\/g, '/')}`
+            ? `http://localhost:3333/${item.avatarUrl.replace(/\\/g, '/')}`
             : null;
 
           return (
@@ -90,7 +71,7 @@ const DataReview = ({ reviews, refetch }) => {
                     src={avatarUrl}
                     alt={item.fullname}
                     className="dashboard-avatar"
-                    style={{ borderRadius: '50%', width:'100px', height:'100px', objectFit:'cover' }}
+                    style={{ borderRadius: '50%', width: '100px', height: '100px', objectFit: 'cover' }}
                     onError={(e) => {
                       e.target.src = 'https://www.mountainmotorvehicles.co.uk/wp-content/uploads/2024/05/No-image-available-2.jpg';
                     }}

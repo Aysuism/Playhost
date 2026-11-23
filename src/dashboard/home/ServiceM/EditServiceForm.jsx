@@ -1,7 +1,7 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import { useEditServiceMutation } from '../../tools/api/home-service';
-import Swal from 'sweetalert2';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
 const EditServiceForm = ({ service, onClose, refetch }) => {
     const { lang } = useContext(LangContext)
@@ -43,22 +43,12 @@ const EditServiceForm = ({ service, onClose, refetch }) => {
 
         try {
             await editService({ id: service._id, formData: data }).unwrap();
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: 'Service updated successfully!',
-                timer: 2000,
-                showConfirmButton: true
-            });
+            notify.updated();
             refetch();
             onClose();
         } catch (error) {
             console.error('Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: error.data?.message || 'Failed to update service',
-            });
+            notify.updateFailed(error.data?.message);
         }
     };
 

@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useDeleteServiceMutation } from '../../tools/api/home-service';
 import EditServiceForm from './EditServiceForm';
 import { LangContext } from '../../../context/LangContext';
-import Swal from 'sweetalert2';
+import { notify } from '../../../hooks/useNotify';
 
 const DataService = ({ services, refetch }) => {
     const { lang } = useContext(LangContext);
@@ -10,29 +10,7 @@ const DataService = ({ services, refetch }) => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [deleteService] = useDeleteServiceMutation();
 
-    const handleDelete = async (id) => {
-        if (window.confirm(lang === 'AZ'
-            ? 'Bu xidməti silmək istədiyinizə əminsiniz?'
-            : 'Are you sure you want to delete this service?')) {
-            try {
-                await deleteService(id).unwrap();
-                Swal.fire({
-                    icon: 'success',
-                    title: lang === 'AZ' ? 'Uğurlu!' : 'Success!',
-                    text: lang === 'AZ' ? 'Xidmət uğurla silindi!' : 'Service deleted successfully!',
-                    timer: 2000,
-                    showConfirmButton: true
-                });
-                refetch();
-            } catch (error) {
-                Swal.fire({
-                    icon: 'error',
-                    title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-                    text: lang === 'AZ' ? 'Xidmət silinərkən xəta baş verdi' : 'Failed to delete service',
-                });
-            }
-        }
-    };
+  const handleDelete = (id) => notify.deleteItem(() => deleteService(id).unwrap(), refetch);
 
     return (
         <div className="dashboard-container">
@@ -81,7 +59,7 @@ const DataService = ({ services, refetch }) => {
             <div className="dashboard-grid ">
                 {services.map((item) => {
                     const imageUrl = item.iconUrl
-                        ? `https://playhost-backend-production.up.railway.app/${item.iconUrl.replace(/\\/g, '/')}`
+                        ? `http://localhost:3333/${item.iconUrl.replace(/\\/g, '/')}`
                         : null;
 
                     return (
@@ -90,8 +68,8 @@ const DataService = ({ services, refetch }) => {
                                 <img
                                     src={imageUrl}
                                     alt={lang === 'AZ' ? item.titleAze : item.titleEng}
-                                    className="dashboard-image"
-                                    style={{ width: '200px', height: '200px', padding: '20px' }}
+                                    className="object-fit-contain"
+                                    style={{ width: '64px', height: '64px', margin: '20px' }}
                                     onError={(e) => {
                                         e.target.src = 'https://www.mountainmotorvehicles.co.uk/wp-content/uploads/2024/05/No-image-available-2.jpg';
                                     }}

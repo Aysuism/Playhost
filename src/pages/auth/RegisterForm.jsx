@@ -1,159 +1,182 @@
-import { useContext } from "react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
 import { LangContext } from "../../context/LangContext";
+import { apiFetch } from "../../app";
+import { notify } from "../../hooks/useNotify";
 
 const RegisterForm = () => {
-  const { lang } = useContext(LangContext)
+  const { lang } = useContext(LangContext);
+  const navigate = useNavigate();
   const [error, setError] = useState(null);
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [registerForm, setRegisterForm] = useState({
     name: '',
     surname: '',
+    username: '',
     email: '',
     password: '',
-    phone: '',
-    avatar: null
+    phone: ''
   });
-  const navigate = useNavigate();
+
+  const handleChange = (field) => (e) =>
+    setRegisterForm({ ...registerForm, [field]: e.target.value });
+
+  const handlePhoneChange = (e) => {
+    let digits = e.target.value.replace(/\D/g, '');
+
+    if (digits.length > 9 && digits.startsWith('994')) digits = digits.slice(3);
+
+    digits = digits.replace(/^0+/, '').slice(0, 9);
+    setRegisterForm({ ...registerForm, phone: digits });
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    // Client-side validation
-    if (!registerForm.name || !registerForm.surname || !registerForm.email ||
-      !registerForm.password || !registerForm.phone) {
-      setError(lang === 'AZ' ? 'Bütün sahələri doldurun' : 'Please fill all fields');
-      return;
-    }
-
-    if (registerForm.password.length < 6) {
-      setError(lang === 'AZ' ? 'Şifrə ən azı 6 simvol olmalıdır' : 'Password must be at least 6 characters');
+    if (registerForm.password !== confirmPassword) {
+      notify.error('Şifrələr eyni deyil', 'Passwords do not match');
       return;
     }
 
     try {
-      // Get existing users from localStorage or initialize
-      const users = JSON.parse(localStorage.getItem('users')) || [];
+      const res = await apiFetch('auth/register', {
+        method: 'POST',
+        body: JSON.stringify({ ...registerForm, phone: `+994${registerForm.phone}` }),
+      });
 
-      // Check if email already exists
-      if (users.some(user => user.email === registerForm.email)) {
-        setError(lang === 'AZ' ? 'Bu email artıq istifadə olunub' : 'Email already exists');
+      if (!res.ok) {
+        notify.error('Qeydiyyat alınmadı', 'Registration failed', await res.text());
         return;
       }
 
-      // Create new user
-      const newUser = {
-        ...registerForm,
-        id: Date.now().toString(),
-        role: "user",
-        active: true,
-        // Remove avatar from storage for simplicity (or convert to base64)
-      };
-
-      // Save to localStorage
-      localStorage.setItem('users', JSON.stringify([...users, newUser]));
-
-      // Show success message
-      await Swal.fire({
-        icon: 'success',
-        title: lang === 'AZ' ? 'Uğurlu qeydiyyat!' : 'Registration successful!',
-        text: lang === 'AZ' ? 'Hesabınız yaradıldı' : 'Your account has been created'
-      });
-
-      // Redirect to login page
+      notify.success('Hesabınız yaradıldı', 'Your account has been created');
       navigate('/auth/login');
     } catch (err) {
-      setError(lang === 'AZ' ? 'Xəta baş verdi' : 'An error occurred');
-      console.error('Registration error:', err);
+      notify.error('Server ilə əlaqə yoxdur', 'Cannot reach the server');
     }
   };
 
   return (
-    <div className="form-container sign-up">
-      <h1>{lang === 'AZ' ? 'Qeydiyyatdan Keç' : 'Register'}</h1>
-      {error && (
-        <div className="error-message">
-          {error}
+    <section className="form-container sign-in register">
+      <form onSubmit={handleRegister} className="auth-form">
+        <h1>{lang === 'AZ' ? 'Hesab Yarat' : 'Register'}</h1>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="reg-name">{lang === 'AZ' ? 'Ad' : 'Name'}</label>
+            <input
+              id="reg-name"
+              type="text"
+              value={registerForm.name}
+              onChange={handleChange('name')}
+              placeholder={lang === 'AZ' ? 'Ad' : 'Name'}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="reg-surname">{lang === 'AZ' ? 'Soyad' : 'Surname'}</label>
+            <input
+              id="reg-surname"
+              type="text"
+              value={registerForm.surname}
+              onChange={handleChange('surname')}
+              placeholder={lang === 'AZ' ? 'Soyad' : 'Surname'}
+              required
+            />
+          </div>
         </div>
-      )}
-      <form onSubmit={handleRegister}>
+
         <div className="form-group">
+          <label htmlFor="reg-username">{lang === 'AZ' ? 'İstifadəçi Adı' : 'Username'}</label>
           <input
+            id="reg-username"
             type="text"
-            value={registerForm.name}
-            onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
-            placeholder={lang === 'AZ' ? 'Ad' : 'Name'}
+            value={registerForm.username}
+            onChange={handleChange('username')}
+            placeholder={lang === 'AZ' ? 'İstifadəçi Adı' : 'Username'}
             required
           />
         </div>
 
         <div className="form-group">
+          <label htmlFor="reg-email">{lang === 'AZ' ? 'E-poçt' : 'Email'}</label>
           <input
-            type="text"
-            value={registerForm.surname}
-            onChange={(e) => setRegisterForm({ ...registerForm, surname: e.target.value })}
-            placeholder={lang === 'AZ' ? 'Soyad' : 'Surname'}
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <input
+            id="reg-email"
             type="email"
             value={registerForm.email}
-            onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
+            onChange={handleChange('email')}
             placeholder={lang === 'AZ' ? 'E-poçt' : 'Email'}
+            minLength="10"
+            maxLength="50"
             required
           />
         </div>
 
         <div className="form-group">
-          <input
-            type="password"
-            value={registerForm.password}
-            onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
-            placeholder={lang === 'AZ' ? 'Şifrə (minimum 6 simvol)' : 'Password (min 6 chars)'}
-            minLength="6"
-            required
-          />
+          <label htmlFor="reg-phone">{lang === 'AZ' ? 'Telefon' : 'Phone'}</label>
+          <div className="phone-input">
+            <span className="phone-prefix">+994</span>
+            <input
+              id="reg-phone"
+              type="tel"
+              inputMode="numeric"
+              value={registerForm.phone}
+              onChange={handlePhoneChange}
+              placeholder="501234567"
+              pattern="[0-9]{9}"
+              maxLength="9"
+              title={lang === 'AZ' ? '9 rəqəm daxil edin' : 'Enter 9 digits'}
+              required
+            />
+          </div>
         </div>
 
-        <div className="form-group">
-          <input
-            type="tel"
-            value={registerForm.phone}
-            onChange={(e) => setRegisterForm({ ...registerForm, phone: e.target.value })}
-            placeholder={lang === 'AZ' ? 'Telefon' : 'Phone'}
-            required
-          />
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="reg-password">{lang === 'AZ' ? 'Şifrə' : 'Password'}</label>
+            <input
+              id="reg-password"
+              type="password"
+              value={registerForm.password}
+              onChange={handleChange('password')}
+              placeholder={lang === 'AZ' ? 'Şifrə' : 'Password'}
+              minLength="8"
+              maxLength="50"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="reg-confirm">
+              {lang === 'AZ' ? 'Şifrəni təsdiqlə' : 'Confirm Password'}
+            </label>
+            <input
+              id="reg-confirm"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder={lang === 'AZ' ? 'Şifrəni təsdiqlə' : 'Confirm Password'}
+              minLength="8"
+              maxLength="50"
+              required
+            />
+          </div>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="avatar-upload" className="file-upload-label">
-            {lang === 'AZ' ? 'Profil şəkli' : 'Profile Picture'}
-          </label>
-          <input
-            id="avatar-upload"
-            type="file"
-            accept="image/*"
-            onChange={(e) => setRegisterForm({ ...registerForm, avatar: e.target.files[0] })}
-            className="file-upload-input"
-          />
-        </div>
-
-        <button type="submit" className="submit-button">
+        <button type="submit" className="auth-submit">
           {lang === 'AZ' ? 'Qeydiyyatdan Keç' : 'Sign Up'}
         </button>
 
-        <div className="auth-switch">
+        <div className="auth-toggle">
           {lang === 'AZ' ? 'Artıq hesabınız var?' : 'Already have an account?'}
-          <Link to="/auth/login" className="auth-link">
+          <br />
+          <Link to="/auth/login" className="auth-switch">
             {lang === 'AZ' ? 'Daxil Ol' : 'Login'}
           </Link>
         </div>
       </form>
-    </div>
+    </section>
   );
 };
 

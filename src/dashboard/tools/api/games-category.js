@@ -1,8 +1,9 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from '../../../app';
 
 export const gameCategoryApi = createApi({
     reducerPath: 'gameCategoryApi',
-    baseQuery: fetchBaseQuery({ baseUrl: 'https://playhost-backend-production.up.railway.app/' }),
+    baseQuery,
     endpoints: (builder) => ({
         getCategory: builder.query({
             query: () => '/category',

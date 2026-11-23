@@ -1,47 +1,28 @@
-import { useContext, useEffect, useState } from "react";
-import { LangContext } from "../../context/LangContext";
-import Swal from "sweetalert2";
+import { useContext, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { Outlet, useNavigate } from "react-router-dom";
+import { LangContext } from "../../context/LangContext";
+import { notify } from "../../hooks/useNotify";
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { lang } = useContext(LangContext);
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
 
-  const [isAllowed, setIsAllowed] = useState(false);
-  const user = JSON.parse(localStorage.getItem("loggedInUser"));
-  const isAdmin = localStorage.getItem("adminAccess") === "true";
+  const isAdmin = user?.role === "admin";
+  const isAllowed = isAuthenticated && (!adminOnly || isAdmin);
 
   useEffect(() => {
-    // No user = not logged in
-    if (!user) {
-      Swal.fire({
-        title: lang === "AZ" ? "Daxil olmağınız tələb edilir" : "Login Required",
-        text: lang === "AZ"
-          ? "Bu səhifəyə daxil olmaq üçün hesabınıza daxil olmalısınız"
-          : "You need to login to access this page",
-        icon: "warning",
-        confirmButtonText: lang === "AZ" ? "Daxil ol" : "Login",
-        allowOutsideClick: false
-      }).then(() => {
-        navigate("/auth/login");
-      });
-    } else if (adminOnly && !isAdmin) {
-      localStorage.removeItem("adminAccess");
-      Swal.fire({
-        title: lang === "AZ" ? "Giriş qadağandır" : "Access Denied",
-        text: lang === "AZ"
-          ? "Admin panelinə giriş hüququnuz yoxdur"
-          : "You don't have permission to access admin panel",
-        icon: "error"
-      }).then(() => {
-        navigate("/");
-      });
-    } else {
-      setIsAllowed(true);
-    }
-  }, [user, isAdmin, adminOnly, lang, navigate]);
+    if (isAllowed) return;
 
-  // Block rendering until we know access is allowed
+    if (!isAuthenticated) {
+      notify.warning('Bu səhifəyə daxil olmaq üçün hesabınıza daxil olmalısınız', 'You need to login to access this page');
+      navigate('/auth/login', { replace: true });
+    } else {
+      notify.error('Admin panelinə giriş hüququnuz yoxdur', "You don't have permission to access admin panel");
+      navigate('/', { replace: true });
+    }
+  }, [isAllowed, isAuthenticated, navigate]);
   if (!isAllowed) return null;
 
   return children || <Outlet />;

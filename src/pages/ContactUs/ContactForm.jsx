@@ -1,7 +1,7 @@
-import React, { useContext, useState } from 'react';
-import { LangContext } from '../../context/LangContext';
+import { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Swal from 'sweetalert2';
+import { LangContext } from '../../context/LangContext';
+import { notify } from '../../hooks/useNotify';
 
 const ContactForm = () => {
     const { lang } = useContext(LangContext);
@@ -56,15 +56,8 @@ const ContactForm = () => {
             return;
         }
 
-        // Show SweetAlert2 confirmation message
-        Swal.fire({
-            icon: 'success',
-            title: lang === 'AZ' ? 'Mesajınız göndərildi!' : 'Your message has been sent!',
-            showConfirmButton: false,
-            timer: 1500, // Message disappears after 1.5 seconds
-        }).then(() => {
-            window.location.reload(); // Reload the page after the alert disappears
-        });
+        notify.success('Mesajınız göndərildi!', 'Your message has been sent!');
+        setFormData({ name: '', email: '', phone: '', message: '' });
     };
 
     return (

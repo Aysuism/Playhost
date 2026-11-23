@@ -1,13 +1,12 @@
-import React, { useState, useContext } from 'react';
-import Swal from 'sweetalert2';
+import { useState, useContext } from 'react';
 import { useAddCategoryMutation } from '../../tools/api/games-category';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
-const AddCatForm = ({ refetch }) => {
-  const { lang } = useContext(LangContext);  // Accessing lang from context
+const AddCatForm = ({ refetch, onClose }) => {
+  const { lang } = useContext(LangContext);
   const [formData, setFormData] = useState({
     category: '',
-    categoryId: '',
   });
 
   const [addCategory, { isLoading }] = useAddCategoryMutation();
@@ -16,7 +15,7 @@ const AddCatForm = ({ refetch }) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'categoryId' ? Number(value) || '' : value
+      [name]: value
     }));
   };
 
@@ -24,49 +23,28 @@ const AddCatForm = ({ refetch }) => {
     e.preventDefault();
 
     if (!formData.category.trim()) {
-      Swal.fire(lang === 'AZ' ? 'Xəta!' : 'Error!', lang === 'AZ' ? 'Kateqoriya adı tələb olunur' : 'Category name is required', 'error');
-      return;
-    }
-
-    if (!formData.categoryId) {
-      Swal.fire(lang === 'AZ' ? 'Xəta!' : 'Error!', lang === 'AZ' ? 'Kateqoriya ID-si tələb olunur' : 'Category ID is required', 'error');
+      notify.error('Kateqoriya adı tələb olunur', 'Category name is required');
       return;
     }
 
     try {
-      // Send as regular JSON object instead of FormData
       await addCategory({
         category: formData.category.trim(),
-        categoryId: formData.categoryId
       }).unwrap();
-      
-      Swal.fire({
-        icon: 'success',
-        title: lang === 'AZ' ? 'Uğurlu!' : 'Success!',
-        text: lang === 'AZ' ? 'Kateqoriya uğurla əlavə olundu' : 'Category added successfully',
-        timer: 2000,
-        showConfirmButton: false
-      });
-      
-      // Reset form and refetch data
-      setFormData({
-        category: '',
-        categoryId: '',
-      });
+
+      notify.added();
+
+      setFormData({ category: '' });
       refetch();
+      if (onClose) onClose();
     } catch (err) {
       console.error('Error adding category:', err);
-      Swal.fire({
-        icon: 'error',
-        title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-        text: err.data?.message || (lang === 'AZ' ? 'Kateqoriya əlavə olunarkən xətaya yol verildi' : 'Failed to add category'),
-      });
+      notify.addFailed(err.data?.message);
     }
   };
-
   return (
     <form onSubmit={handleSubmit} className="form-container p-3 border rounded">
-      
+
       <div className="mb-3">
         <label htmlFor="category" className="form-label">{lang === 'AZ' ? 'Kateqoriya Adı' : 'Category Name'}</label>
         <input
@@ -81,23 +59,9 @@ const AddCatForm = ({ refetch }) => {
         />
       </div>
 
-      <div className="mb-3">
-        <label htmlFor="categoryId" className="form-label">{lang === 'AZ' ? 'Kateqoriya ID' : 'Category ID'}</label>
-        <input
-          type="number"
-          id="categoryId"
-          name="categoryId"
-          className="form-control"
-          value={formData.categoryId}
-          onChange={handleChange}
-          required
-          min="1"
-        />
-      </div>
-
       <div className="d-flex justify-content-end">
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="btn btn-primary px-4"
           disabled={isLoading}
         >

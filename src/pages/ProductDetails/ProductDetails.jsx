@@ -5,7 +5,6 @@ import ServerHosting from './ServerHosting';
 import Configurations from './Configurations';
 import { useGetGamesQuery } from '../../dashboard/tools/api/games';
 import { LangContext } from '../../context/LangContext';
-import CommentSection from './Comments/CommentSection';
 
 const ProductDetails = () => {
   const { lang } = useContext(LangContext);
@@ -28,8 +27,6 @@ const ProductDetails = () => {
     <div className="product-details">
       <ServerHosting alldata={findProduct} />
       <Configurations alldata={findProduct} />
-      <CommentSection gameId={findProduct._id} />
-
     </div>
   );
 };

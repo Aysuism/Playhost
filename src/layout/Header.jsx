@@ -2,14 +2,19 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LangContext } from '../context/LangContext';
 import { ThemeContext } from '../context/ThemeContext';
-import { useCart } from 'react-use-cart';
 import { FaCartShopping } from "react-icons/fa6";
 import { FaHeart } from "react-icons/fa";
 import { FaTimes } from "react-icons/fa";
 import { RiMenuFill } from "react-icons/ri";
 import { useGetSettingsQuery } from '../dashboard/tools/api/settings';
+import { useServerCart } from '../hooks/useServerCart';
+import { IoMoon, IoSunny } from 'react-icons/io5';
 import Loader from '../preloader/Loader';
-import Swal from 'sweetalert2';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../dashboard/tools/api/auth-slice';
+import { wishlistApi } from '../dashboard/tools/api/wishlist';
+import { cartApi } from '../dashboard/tools/api/cart';
+import { toast } from '../components/Toaster';
 
 const Header = ({ togglePanel }) => {
     const navigate = useNavigate();
@@ -27,7 +32,7 @@ const Header = ({ togglePanel }) => {
     };
 
     // ------------------------------- Cart -----------------
-    const { totalItems } = useCart();
+    const { totalItems } = useServerCart();
 
     // ------------------------------- General Setting Logo -----------------
     const { data: settings, isLoading, isError } = useGetSettingsQuery();
@@ -49,46 +54,28 @@ const Header = ({ togglePanel }) => {
         return () => window.removeEventListener('resize', handleResize);
     }, [showMobileMenu]);
 
-
-    // ------------------------------- Logged In User -----------------
-
-    const checkUser = () => {
-        const user = JSON.parse(localStorage.getItem('loggedInUser'));
-
-        if (!user) {
-            Swal.fire({
-                title: lang === "AZ" ? "Daxil olmağınız tələb edilir" : "Login Required",
-                text: lang === "AZ" ? "İstək siyahısına giris üçün üçün daxil olun" : "Please login to get access to wishlist",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonText: lang === "AZ" ? "Daxil ol" : "Login",
-                cancelButtonText: lang === "AZ" ? "Ləğv et" : "Cancel"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    navigate('/auth/login');
-                }
-            });
-            return false;
-        }
-        return true;
-    };
-
-    const [loggedInUser, setLoggedInUser] = useState(null);
+    // ------------------------------- Scroll background -----------------
+    const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
-        const storedUser = JSON.parse(localStorage.getItem('loggedInUser'));
-        if (storedUser) {
-            setLoggedInUser(storedUser);
-        }
+        const handleScroll = () => setScrolled(window.scrollY > 10);
+        handleScroll();
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    // ------------------------------- Logged In User -----------------
+    const dispatch = useDispatch();
+    const { user: loggedInUser } = useSelector((state) => state.auth);
 
     const isAdmin = loggedInUser?.role === 'admin';
 
     const handleLogout = () => {
-        localStorage.removeItem('loggedInUser');
-        localStorage.removeItem('adminAccess');
-        setLoggedInUser(null);
-        window.location.reload();
+        dispatch(logout());
+        dispatch(wishlistApi.util.resetApiState());
+        dispatch(cartApi.util.resetApiState());
+        toast.info(lang === 'AZ' ? 'Hesabdan çıxdınız' : 'You have been logged out');
+        navigate('/');
     };
 
     if (isLoading) return <Loader />;
@@ -96,13 +83,13 @@ const Header = ({ togglePanel }) => {
     if (!settings) return <div>No settings found</div>;
 
     return (
-        <header>
+        <header className={scrolled ? 'scrolled' : ''}>
             {/* Mobile Menu Overlay */}
             <div className={`mobile-menu-overlay ${showMobileMenu ? 'show' : ''}`} onClick={toggleMobileMenu} />
 
             <nav className="navbar navbar-expand">
                 <Link key={settings._id || Math.random()} className='navbar-brand' to="/">
-                    <img src={`https://playhost-backend-production.up.railway.app/${settings[0].logo}`} alt="Logo" />
+                    <img src={`http://localhost:3333/${settings?.logo}`} alt="Logo" />
                 </Link>
 
                 {/* Mobile Menu Close Button (shown only when menu is open) */}
@@ -112,97 +99,152 @@ const Header = ({ togglePanel }) => {
                     </button>
                 )}
 
-
-                <div className={`navbar-collapse ${showMobileMenu ? 'show' : ''}`} id="navbarNav">
-                    <ul className="navbar-nav">
-                        {/* Only show Dashboard link if user is an admin */}
-                        {isAdmin && (
+                {/* ======================= DESKTOP VERSION ======================= */}
+                <div className="desktop-nav">
+                    <div className="navbar-collapse">
+                        <ul className="navbar-nav">
+                            {isAdmin && (
+                                <li className="nav-item">
+                                    <Link className="nav-link" to='/dashboard'>{lang === 'AZ' ? 'İdarə Paneli' : 'Dashboard'}</Link>
+                                </li>
+                            )}
                             <li className="nav-item">
-                                <Link className="nav-link" to='/dashboard' onClick={toggleMobileMenu}>{lang === 'AZ' ? 'İdarə Paneli' : 'Dashboard'}</Link>
+                                <Link className="nav-link" to='/'>{lang === 'AZ' ? 'Ev' : 'Home'}</Link>
                             </li>
+                            <li className="nav-item">
+                                <Link className="nav-link" to='/games'>{lang === 'AZ' ? 'Oyunlar' : 'Games'}</Link>
+                            </li>
+                            <li className="nav-item dropdown">
+                                <button className="btn text-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {lang === 'AZ' ? 'Şirkət' : 'Company'}
+                                </button>
+                                <ul className="dropdown-menu">
+                                    <li><Link className="dropdown-item" to="/blog">Blog</Link></li>
+                                    <li><Link className="dropdown-item" to="/about">{lang === 'AZ' ? 'Haqqımızda' : 'About Us'}</Link></li>
+                                </ul>
+                            </li>
+                            <li className="nav-item dropdown">
+                                <button className="btn text-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {lang === 'AZ' ? 'Dəstək' : 'Support'}
+                                </button>
+                                <ul className="dropdown-menu">
+                                    <li><Link className="dropdown-item" to="/faq">FAQ</Link></li>
+                                    <li><Link className="dropdown-item" to="/contact">{lang === 'AZ' ? 'Ələqə saxla' : 'Contact Us'}</Link></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div className="buttons">
+                        <button className="lang-btn" onClick={toggleLanguage}>
+                            {lang === "AZ" ? "AZ" : "EN"}
+                        </button>
+
+                        <button className="theme-btn" onClick={toggleTheme}>
+                            {theme === "light" ? <IoSunny color="#fff" size={20} /> : <IoMoon color="#fff" size={20} />}
+                        </button>
+
+                        {loggedInUser && (
+                            <>
+                                <button className='btn cart-btn' onClick={togglePanel}>
+                                    <FaCartShopping className='cart' />({totalItems})
+                                </button>
+
+                                <button className='btn heart-btn' onClick={() => navigate('/wishlist')}>
+                                    <FaHeart className='heart' />
+                                </button>
+                            </>
                         )}
-                        <li className="nav-item">
-                            <Link className="nav-link" to='/' onClick={toggleMobileMenu}>{lang === 'AZ' ? 'Ev' : 'Home'}</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to='/games' onClick={toggleMobileMenu}>{lang === 'AZ' ? 'Oyunlar' : 'Games'}</Link>
-                        </li>
-                        <li className="nav-item dropdown">
-                            <button className="btn text-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" >
-                                {lang === 'AZ' ? 'Şirkət' : 'Company'}
-                            </button>
-                            <ul className="dropdown-menu">
-                                <li>
-                                    <Link className="dropdown-item" to="/blog" onClick={toggleMobileMenu}>Blog</Link>
-                                </li>
-                                <li>
-                                    <Link className="dropdown-item" to="/about" onClick={toggleMobileMenu}>{lang === 'AZ' ? 'Haqqımızda' : 'About Us'}</Link>
-                                </li>
-                            </ul>
-                        </li>
-                        <li className="nav-item dropdown">
-                            <button className="btn text-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" >
-                                {lang === 'AZ' ? 'Dəstək' : 'Support'}
-                            </button>
-                            <ul className="dropdown-menu">
-                                <li>
-                                    <Link className="dropdown-item" to="/faq" onClick={toggleMobileMenu}>FAQ</Link>
-                                </li>
-                                <li>
-                                    <Link className="dropdown-item" to="/contact" onClick={toggleMobileMenu}>{lang === 'AZ' ? 'Ələqə saxla' : 'Contact Us'}</Link>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+
+                        {loggedInUser ? (
+                            <div className="dropdown">
+                                <button className="btn user-dropdown-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {loggedInUser.username}
+                                </button>
+                                <ul className="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <button className="dropdown-item" onClick={handleLogout}> Logout </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        ) : (
+                            <Link to={'/auth'} className='btn sign-in-btn'>Sign in</Link>
+                        )}
+                    </div>
                 </div>
 
-                {/* Right Side Buttons */}
-                <div className="buttons">
-                    <button className="btn lang-btn" onClick={toggleLanguage}>
-                        {lang === "AZ" ? "EN" : "AZ"}
+                {/* ======================= MOBILE VERSION ======================= */}
+                <div className="mobile-nav">
+                    <button className="navbar-toggler" type="button" onClick={toggleMobileMenu} aria-label="Toggle navigation">
+                        <RiMenuFill />
                     </button>
 
-                    <button className="btn theme-btn" onClick={toggleTheme}>
-                        {theme === "light" ? "🌙" : "☀️"}
-                    </button>
+                    <div className={`mobile-drawer ${showMobileMenu ? 'show' : ''}`}>
+                        <ul className="navbar-nav">
+                            {isAdmin && (
+                                <li className="nav-item">
+                                    <Link className="nav-link" to='/dashboard' onClick={toggleMobileMenu}>{lang === 'AZ' ? 'İdarə Paneli' : 'Dashboard'}</Link>
+                                </li>
+                            )}
+                            <li className="nav-item">
+                                <Link className="nav-link" to='/' onClick={toggleMobileMenu}>{lang === 'AZ' ? 'Ev' : 'Home'}</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className="nav-link" to='/games' onClick={toggleMobileMenu}>{lang === 'AZ' ? 'Oyunlar' : 'Games'}</Link>
+                            </li>
+                            <li className="nav-item dropdown">
+                                <button className="btn text-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {lang === 'AZ' ? 'Şirkət' : 'Company'}
+                                </button>
+                                <ul className="dropdown-menu">
+                                    <li><Link className="dropdown-item" to="/blog" onClick={toggleMobileMenu}>Blog</Link></li>
+                                    <li><Link className="dropdown-item" to="/about" onClick={toggleMobileMenu}>{lang === 'AZ' ? 'Haqqımızda' : 'About Us'}</Link></li>
+                                </ul>
+                            </li>
+                            <li className="nav-item dropdown">
+                                <button className="btn text-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {lang === 'AZ' ? 'Dəstək' : 'Support'}
+                                </button>
+                                <ul className="dropdown-menu">
+                                    <li><Link className="dropdown-item" to="/faq" onClick={toggleMobileMenu}>FAQ</Link></li>
+                                    <li><Link className="dropdown-item" to="/contact" onClick={toggleMobileMenu}>{lang === 'AZ' ? 'Ələqə saxla' : 'Contact Us'}</Link></li>
+                                </ul>
+                            </li>
+                        </ul>
 
-                    <button className='btn cart-btn' onClick={togglePanel}>
-                        <FaCartShopping className='cart' />({totalItems})
-                    </button>
-
-                    <button
-                        className='btn heart-btn'
-                        onClick={() => {
-                            if (checkUser()) {
-                                navigate('/wishlist');
-                            }
-                        }}
-                    >
-                        <FaHeart className='heart' />
-                    </button>
-
-                    {loggedInUser ? (
-                        <div className="dropdown">
-                            <button className="btn user-dropdown-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" >
-                                👋 {loggedInUser.username}
+                        <div className="drawer-buttons">
+                            <button className="btn" onClick={toggleLanguage}>
+                                {lang === "AZ" ? "AZ" : "EN"}
                             </button>
 
-                            <ul className="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <button className="dropdown-item" onClick={handleLogout} > Logout </button>
-                                </li>
-                            </ul>
+                            <button className="btn" onClick={toggleTheme}>
+                                {theme === "light" ? <IoSunny size={20} /> : <IoMoon size={20} />}
+                            </button>
+
+                            {loggedInUser && (
+                                <>
+                                    <button className='btn' onClick={() => { setShowMobileMenu(false); togglePanel(); }}>
+                                        <FaCartShopping /> ({totalItems})
+                                    </button>
+
+                                    <button className='btn' onClick={() => { setShowMobileMenu(false); navigate('/wishlist'); }}>
+                                        <FaHeart />
+                                    </button>
+                                </>
+                            )}
+
+                            {loggedInUser ? (
+                                <button className="btn" onClick={() => { setShowMobileMenu(false); handleLogout(); }}>
+                                    Logout
+                                </button>
+                            ) : (
+                                <Link to={'/auth'} className='btn' onClick={() => setShowMobileMenu(false)}>
+                                    Sign in
+                                </Link>
+                            )}
                         </div>
-                    ) : (
-                        <Link to={'/auth'} className='btn sign-in-btn'>
-                            Sign in
-                        </Link>
-                    )}
+                    </div>
                 </div>
-
-                {/* Mobile Menu Toggle Button */}
-                <button className="navbar-toggler" type="button" onClick={toggleMobileMenu} aria-label="Toggle navigation" > <RiMenuFill /> </button>
-           
             </nav>
         </header>
     );

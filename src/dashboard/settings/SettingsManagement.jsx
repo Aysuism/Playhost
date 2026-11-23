@@ -7,7 +7,7 @@ const SettingsManagement = () => {
   const { lang } = useContext(LangContext);
   const { data: settings = [], refetch } = useGetSettingsQuery();
 
-  if (!settings || settings.length === 0) return <div>No settings found</div>;
+  if (!settings) return <div>No settings found</div>;
 
   return (
     <div className="settings-management">

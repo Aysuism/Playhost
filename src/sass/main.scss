@@ -1,0 +1,100 @@
+ //-----------------------ABSTRACTS------------------
+ @import './abstracts/variables';
+ @import './abstracts/mixin';
+ @import './abstracts/theme';
+
+
+ //-----------------------LAYOUTS------------------
+ @import './layout/header.scss';
+ @import './layout/footer.scss';
+ @import './layout/toast.scss';
+
+
+ //-----------------------PAGES------------------
+ @import './pages/home.scss';
+ @import './pages/game-servers.scss';
+ @import './pages/about.scss';
+ @import './pages/blog.scss';
+ @import './pages/contact.scss';
+ @import './pages/faq.scss';
+
+ @import './pages/basket.scss';
+ @import './pages/wishlist.scss';
+ @import './pages/product-details.scss';
+ @import './pages/blog-details.scss';
+ @import './pages/checkout.scss';
+
+
+ @import './pages/not-found-page.scss';
+
+ //-----------------------DASHBOARD----------------
+ @import './dashboard/dashboard.scss';
+ @import './dashboard/home-management.scss';
+ @import './dashboard/about-management.scss';
+ @import './dashboard/games-management.scss';
+ @import './dashboard/footer-management.scss';
+
+ //-----------------------Login/Register----------------
+ @import './auth/auth.scss';
+ @import './auth/admin-login.scss';
+
+ *,
+ body {
+     font-family: $font-Oxanium;
+     box-sizing: border-box;
+     .loader {
+         height: 100vh;
+         background-color: $bg-color;
+         @include d-flex;
+     }
+
+     p {
+         font-family: $font-Manrope;
+     }
+ }
+
+ /* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+::-webkit-scrollbar-track {
+    background: #0F101E;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+        180deg,
+        rgb(113, 127, 252) 0%,
+        rgb(65, 23, 173) 100%
+    );
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(113, 127, 252);
+}
+
+$cursor-default: url("/cursor.png") 1 1, auto;
+$cursor-pointer: url("/cursor-pointer.png") 1 1, pointer;
+
+html,
+body {
+  cursor: $cursor-default !important;
+}
+
+a,
+button,
+[role="button"],
+label,
+input[type="submit"],
+[class*="btn"] {
+  cursor: $cursor-pointer !important;
+}

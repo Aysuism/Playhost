@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
-import Swal from 'sweetalert2';
 import { useAddReviewMutation } from '../../tools/api/about-review';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
 const AddReviewForm = ({ refetch, onClose }) => {
   const { lang } = useContext(LangContext)
@@ -30,12 +30,7 @@ const AddReviewForm = ({ refetch, onClose }) => {
     e.preventDefault();
 
     if (!formData.avatarUrl) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error!',
-        text: 'Please select an avatar image.',
-        confirmButtonText: 'OK',
-      });
+      notify.error('Zəhmət olmasa avatar şəkli seçin.', 'Please select an avatar image.');
       return;
     }
 
@@ -47,32 +42,20 @@ const AddReviewForm = ({ refetch, onClose }) => {
 
     try {
       await addReview(data).unwrap();
-      Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: 'Review successfully added.',
-        confirmButtonText: 'OK',
-      });
-      // Reset form
+      notify.added();
+
       setFormData({
         fullname: '',
         comment: '',
         reyting: 5,
         avatarUrl: null,
       });
-      // Clear file input
       document.querySelector('input[type="file"]').value = '';
-      // Refetch reviews
       refetch();
       onClose();
     } catch (err) {
       console.error('Error submitting review:', err);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error!',
-        text: err.data?.message || 'Failed to add review. Please try again.',
-        confirmButtonText: 'OK',
-      });
+      notify.addFailed(err.data?.message);
     }
   };
 

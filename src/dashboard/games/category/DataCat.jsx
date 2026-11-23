@@ -1,44 +1,15 @@
-import React, { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useDeleteCategoryMutation } from '../../tools/api/games-category';
-import EditCatForm from './EditCatForm';
-import Swal from 'sweetalert2';
-import { useContext } from 'react';
 import { LangContext } from '../../../context/LangContext';
+import EditCatForm from './EditCatForm';
 
 const DataCat = ({ categories = [], refetch, isLoading, isError }) => {
-    const {lang}=useContext(LangContext)
+    const { lang } = useContext(LangContext)
     const [editingCat, setEditingCat] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [deleteCat, { isLoading: isDeleting }] = useDeleteCategoryMutation();
 
-    const handleDelete = async (id) => {
-        Swal.fire({
-            title: lang === 'AZ' ? 'Kateqoriya Silinsin?' : 'Delete Game Category?',
-            text: lang === 'AZ' ? 'Bu əməliyyat geri alına bilməz!' : 'This action cannot be undone!',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: lang === 'AZ' ? 'Sil' : 'Delete',
-            cancelButtonText: lang === 'AZ' ? 'Ləğv et' : 'Cancel',
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    await deleteCat(id).unwrap();
-                    Swal.fire(
-                        lang === 'AZ' ? 'Silindi!' : 'Deleted!',
-                        lang === 'AZ' ? 'Kateqoriya uğurla silindi.' : 'Game category removed successfully.',
-                        'success'
-                    );
-                    refetch();
-                } catch (error) {
-                    Swal.fire(
-                        lang === 'AZ' ? 'Xəta!' : 'Error!',
-                        error.data?.message || (lang === 'AZ' ? 'Kateqoriya silinərkən xətaya yol verildi' : 'Failed to delete game category'),
-                        'error'
-                    );
-                }
-            }
-        });
-    };
+    const handleDelete = (id) => notify.deleteItem(() => deleteCat(id).unwrap(), refetch);
 
     if (isLoading) return <div className="text-center py-4">{lang === 'AZ' ? 'Kateqoriyalar yüklənir...' : 'Loading categories...'}</div>;
     if (isError) return <div className="text-center text-danger py-4">{lang === 'AZ' ? 'Kateqoriyalar yüklənərkən xəta baş verdi' : 'Error loading categories'}</div>;
@@ -86,17 +57,15 @@ const DataCat = ({ categories = [], refetch, isLoading, isError }) => {
             {/* Category Grid */}
             <div className="dashboard-grid">
                 {categories.map((category) => (
-                    <div key={category._id} className="dashboard-card">
+                    <div key={category?._id} className="dashboard-card">
                         <div className="dashboard-content">
-                            <h3>#{category.categoryId || 'N/A'}</h3>
-
                             <div className="dashboard-description">
                                 <div className="description-item">
                                     <span className="description-label">{lang === 'AZ' ? 'Kateqoriya Adı:' : 'Category Name:'}</span>
                                 </div>
                             </div>
 
-                            <h5>{category.category || (lang === 'AZ' ? 'Ad verilməyib' : 'Unnamed')}</h5>
+                            <h5>{category?.category || (lang === 'AZ' ? 'Ad verilməyib' : 'Unnamed')}</h5>
 
                             <div className="dashboard-actions">
                                 <button
@@ -110,7 +79,7 @@ const DataCat = ({ categories = [], refetch, isLoading, isError }) => {
                                 </button>
                                 <button
                                     className="btn btn-delete"
-                                    onClick={() => handleDelete(category._id)}
+                                    onClick={() => handleDelete(category?._id)}
                                     disabled={isDeleting}
                                 >
                                     {isDeleting ? (

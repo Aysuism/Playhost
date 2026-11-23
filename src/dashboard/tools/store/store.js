@@ -18,12 +18,15 @@ import { reviewsApi } from '../api/about-review';
 
 import { settingsApi } from '../api/settings';
 
+import { wishlistApi } from '../api/wishlist';
+
 import { authApi } from '../api/auth';
 import authReducer from '../api/auth-slice';
+import { cartApi } from '../api/cart';
 
 const store = configureStore({
   reducer: {
-    auth:authReducer,
+    auth: authReducer,
     [settingsApi.reducerPath]: settingsApi.reducer,
     [faqApi.reducerPath]: faqApi.reducer,
     [blogApi.reducerPath]: blogApi.reducer,
@@ -38,6 +41,8 @@ const store = configureStore({
     [teamApi.reducerPath]: teamApi.reducer,
     [counterApi.reducerPath]: counterApi.reducer,
     [reviewsApi.reducerPath]: reviewsApi.reducer,
+    [wishlistApi.reducerPath]: wishlistApi.reducer,
+    [cartApi.reducerPath]: cartApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
@@ -56,6 +61,8 @@ const store = configureStore({
       .concat(teamApi.middleware)
       .concat(counterApi.middleware)
       .concat(reviewsApi.middleware)
+      .concat(wishlistApi.middleware)
+      .concat(cartApi.middleware)
       .concat(authApi.middleware)
 });
 

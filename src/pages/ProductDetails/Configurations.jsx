@@ -1,47 +1,40 @@
-import React, { useContext, useEffect } from 'react';
-import Slider from 'rc-slider';
+import { useContext } from 'react';
 import 'rc-slider/assets/index.css';
-import { useCart } from 'react-use-cart';
+import Slider from 'rc-slider';
 import { LangContext } from '../../context/LangContext';
-import Swal from 'sweetalert2';
+import { useServerCart } from '../../hooks/useServerCart';
+import { notify } from '../../hooks/useNotify';
 
 
 const baseFlagUrl = 'https://designesia.com/themes/playhost/images/flags';
 
 // Predefined locations with country and flag URLs
 const PREDEFINED_LOCATIONS = [
-  { country: 'London, England', flagUrl: `${baseFlagUrl}/united-kingdom.png` },
-  { country: 'Paris, France', flagUrl: `${baseFlagUrl}/france.png` },
-  { country: 'Frankfurt, Germany', flagUrl: `${baseFlagUrl}/germany.png` },
-  { country: 'Stockholm, Sweden', flagUrl: `${baseFlagUrl}/sweden.png` },
-  { country: 'Amsterdam, Netherlands', flagUrl: `${baseFlagUrl}/netherlands.png` },
-  { country: 'Helsinki, Finland', flagUrl: `${baseFlagUrl}/finland.png` },
-  { country: 'Los Angeles, USA', flagUrl: `${baseFlagUrl}/usa.png` },
-  { country: 'Quebec, Canada', flagUrl: `${baseFlagUrl}/canada.png` },
-  { country: 'Sydney, Australia', flagUrl: `${baseFlagUrl}/australia.png` },
-  { country: 'Sao Paulo, Brazil', flagUrl: `${baseFlagUrl}/brazil.png` },
-  { country: 'Bangkok, Thailand', flagUrl: `${baseFlagUrl}/thailand.png` },
-  { country: 'Jakarta, Indonesia', flagUrl: `${baseFlagUrl}/indonesia.png` }
+    { country: 'London, England', flagUrl: `${baseFlagUrl}/united-kingdom.png` },
+    { country: 'Paris, France', flagUrl: `${baseFlagUrl}/france.png` },
+    { country: 'Frankfurt, Germany', flagUrl: `${baseFlagUrl}/germany.png` },
+    { country: 'Stockholm, Sweden', flagUrl: `${baseFlagUrl}/sweden.png` },
+    { country: 'Amsterdam, Netherlands', flagUrl: `${baseFlagUrl}/netherlands.png` },
+    { country: 'Helsinki, Finland', flagUrl: `${baseFlagUrl}/finland.png` },
+    { country: 'Los Angeles, USA', flagUrl: `${baseFlagUrl}/usa.png` },
+    { country: 'Quebec, Canada', flagUrl: `${baseFlagUrl}/canada.png` },
+    { country: 'Sydney, Australia', flagUrl: `${baseFlagUrl}/australia.png` },
+    { country: 'Sao Paulo, Brazil', flagUrl: `${baseFlagUrl}/brazil.png` },
+    { country: 'Bangkok, Thailand', flagUrl: `${baseFlagUrl}/thailand.png` },
+    { country: 'Jakarta, Indonesia', flagUrl: `${baseFlagUrl}/indonesia.png` }
 ];
 
 const Configurations = ({ alldata = {} }) => {
     const { lang } = useContext(LangContext);
-    
+
     //--------------------- Basket
-    const { addItem } = useCart();
+    const { addItem } = useServerCart();
 
-    const basketItem = {
-        id: alldata?._id,
-        price: alldata?.discountIndicator ? alldata?.discountedPrice : alldata?.originalPrice,
-        ...alldata
-    };
-
-    const addToCart = () => {
-        addItem(basketItem);
-        Swal.fire({
-            title: lang === "AZ" ? "Məhsul əlavə edildi" : "Product added",
-            icon: "success"
-        });
+    const addToCart = async () => {
+        const ok = await addItem(alldata);
+        if (ok) {
+            notify.success('Məhsul əlavə edildi', 'Product added');
+        }
     };
 
     const durations = [1, 3, 7, 30, 90, 365];
@@ -78,7 +71,7 @@ const Configurations = ({ alldata = {} }) => {
                         marks={marks}
                         step={50}
                         disabled
-                        style={{backgroundColor:'transparent'}}
+                        style={{ backgroundColor: 'transparent' }}
                     />
                 </section>
 
@@ -115,17 +108,16 @@ const Configurations = ({ alldata = {} }) => {
                                 {PREDEFINED_LOCATIONS.map((location, index) => (
                                     <div key={index} className="col-lg-2 col-md-4 col-sm-6 text-center">
                                         <div
-                                            className={`location-item ${
-                                                currentLocation.toLowerCase() === location.country.toLowerCase() ? 'active' : ''
-                                            }`}
+                                            className={`location-item ${currentLocation.toLowerCase() === location.country.toLowerCase() ? 'active' : ''
+                                                }`}
                                         >
-                                            <img 
-                                                src={location.flagUrl} 
-                                                alt={location.country} 
+                                            <img
+                                                src={location.flagUrl}
+                                                alt={location.country}
                                                 style={{
                                                     width: '20%',
                                                     objectFit: 'contain',
-                                                    paddingBottom:'10px'
+                                                    paddingBottom: '10px'
                                                 }}
                                             />
                                             {location.country}

@@ -1,13 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
-import Swal from 'sweetalert2';
+import { useState, useEffect, useContext } from 'react';
 import { useEditSettingsMutation } from '../tools/api/settings';
 import { LangContext } from '../../context/LangContext';
+import { notify } from '../../hooks/useNotify';
 
 const EditSettingForm = ({ setting, onClose, refetch }) => {
     const { lang } = useContext(LangContext);
     const [formData, setFormData] = useState({
-        titleAze: '',
-        titleEng: '',
         descriptionAze: '',
         descriptionEng: '',
         // favIcon: null,
@@ -26,8 +24,6 @@ const EditSettingForm = ({ setting, onClose, refetch }) => {
     useEffect(() => {
         if (setting) {
             setFormData({
-                titleAze: setting.titleAze || '',
-                titleEng: setting.titleEng || '',
                 descriptionAze: setting.descriptionAze || '',
                 descriptionEng: setting.descriptionEng || '',
                 // favIcon: null,
@@ -70,19 +66,13 @@ const EditSettingForm = ({ setting, onClose, refetch }) => {
         e.preventDefault();
 
         if (!setting || !setting._id) {
-            Swal.fire({
-                icon: 'error',
-                title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-                text: lang === 'AZ' ? 'Yanlış parametr məlumatı' : 'Invalid setting data',
-            });
+            notify.error('Yanlış parametr məlumatı', 'Invalid setting data');
             return;
         }
 
         try {
             const data = new FormData();
 
-            data.append('titleAze', formData.titleAze);
-            data.append('titleEng', formData.titleEng);
             data.append('descriptionAze', formData.descriptionAze);
             data.append('descriptionEng', formData.descriptionEng);
 
@@ -100,57 +90,17 @@ const EditSettingForm = ({ setting, onClose, refetch }) => {
                 formData: data
             }).unwrap();
 
-            Swal.fire({
-                icon: 'success',
-                title: lang === 'AZ' ? 'Uğurlu!' : 'Success!',
-                text: lang === 'AZ' ? 'Parametrlər uğurla yeniləndi!' : 'Settings updated successfully!',
-                timer: 2000,
-                confirmButtonText: 'OK',
-            });
+            notify.updated();
             refetch();
             onClose();
         } catch (error) {
             console.error('Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-                text: error.data?.message || (lang === 'AZ' ? 'Parametrlər yenilənərkən xəta baş verdi' : 'Failed to update settings'),
-            });
+            notify.updateFailed(error.data?.message);
         }
     };
 
     return (
         <form onSubmit={handleSubmit} className="form-container p-4 border rounded">
-
-            <div className="mb-3">
-                <label htmlFor="titleAze" className="form-label">
-                    {lang === 'AZ' ? 'Başlıq (AZ)' : 'Title (Aze)'}
-                </label>
-                <input
-                    type="text"
-                    id="titleAze"
-                    name="titleAze"
-                    className="form-control"
-                    value={formData.titleAze}
-                    onChange={handleChange}
-                    required
-                />
-            </div>
-
-            <div className="mb-3">
-                <label htmlFor="titleEng" className="form-label">
-                    {lang === 'AZ' ? 'Başlıq (EN)' : 'Title (Eng)'}
-                </label>
-                <input
-                    type="text"
-                    id="titleEng"
-                    name="titleEng"
-                    className="form-control"
-                    value={formData.titleEng}
-                    onChange={handleChange}
-                    required
-                />
-            </div>
 
             <div className="mb-3">
                 <label htmlFor="descriptionAze" className="form-label">
@@ -181,7 +131,7 @@ const EditSettingForm = ({ setting, onClose, refetch }) => {
                     rows={3}
                 />
             </div>
-{/* 
+            {/* 
             <div className="mb-3">
                 <label htmlFor="favIcon" className="form-label">
                     {lang === 'AZ' ? 'Favicon' : 'Favicon'}
@@ -198,7 +148,7 @@ const EditSettingForm = ({ setting, onClose, refetch }) => {
                     <div className="mt-2">
                         <small>{lang === 'AZ' ? 'Hazırki:' : 'Current:'} </small>
                         <a
-                            href={`https://playhost-backend-production.up.railway.app/${setting.favIcon[0]}`}
+                            href={`http://localhost:3333/${setting.favIcon[0]}`}
                             target="_blank"
                             rel="noopener noreferrer"
                         >
@@ -224,7 +174,7 @@ const EditSettingForm = ({ setting, onClose, refetch }) => {
                     <div className="mt-2">
                         <small>{lang === 'AZ' ? 'Hazırki:' : 'Current:'} </small>
                         <a
-                            href={`https://playhost-backend-production.up.railway.app/${setting.logo[0]}`}
+                            href={`http://localhost:3333/${setting.logo[0]}`}
                             target="_blank"
                             rel="noopener noreferrer"
                         >
@@ -310,8 +260,8 @@ const EditSettingForm = ({ setting, onClose, refetch }) => {
 
             <div className="d-flex justify-content-between">
                 <button type="submit" className="btn btn-primary" disabled={isLoading}>
-                    {isLoading ? 
-                        (lang === 'AZ' ? 'Yenilənir...' : 'Updating...') : 
+                    {isLoading ?
+                        (lang === 'AZ' ? 'Yenilənir...' : 'Updating...') :
                         (lang === 'AZ' ? 'Parametrləri Yenilə' : 'Update Settings')}
                 </button>
                 <button type="button" className="btn btn-secondary" onClick={onClose}>

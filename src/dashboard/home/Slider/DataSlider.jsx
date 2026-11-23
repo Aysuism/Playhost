@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import EditSliderForm from './EditSliderForm';
-import Swal from 'sweetalert2';
 import { useDeleteSliderMutation } from '../../tools/api/home-slider';
 import { useContext } from 'react';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
 const DataSlider = ({ sliders, refetch }) => {
   const { lang } = useContext(LangContext)
@@ -11,27 +11,7 @@ const DataSlider = ({ sliders, refetch }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [deleteSlider, { isLoading: isDeleting }] = useDeleteSliderMutation();
 
-  const handleDelete = async (id) => {
-    Swal.fire({
-      title: 'Delete Slider?',
-      text: "This action cannot be undone!",
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Delete',
-      cancelButtonText: 'Cancel'
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await deleteSlider(id).unwrap();
-          Swal.fire('Deleted!', 'Slider deleted successfully!', 'success');
-          refetch();
-        } catch (error) {
-          Swal.fire('Error!', error.data?.message || 'Failed to delete slider.', 'error');
-
-        }
-      }
-    })
-  };
+  const handleDelete = (id) => notify.deleteItem(() => deleteSlider(id).unwrap(), refetch);
 
   return (
     <div className="dashboard-container">
@@ -75,7 +55,7 @@ const DataSlider = ({ sliders, refetch }) => {
       <div className="dashboard-grid">
         {sliders.map((item) => {
           const imageUrl = item.backgroundImageUrl
-            ? `https://playhost-backend-production.up.railway.app/${item.backgroundImageUrl.replace(/\\/g, '/')}`
+            ? `http://localhost:3333/${item.backgroundImageUrl.replace(/\\/g, '/')}`
             : null;
 
           return (
@@ -115,10 +95,6 @@ const DataSlider = ({ sliders, refetch }) => {
                   <div className="meta-item">
                     <span className="meta-label">{lang === 'AZ' ? 'Qiymət' : 'Price'}:</span>
                     <span className="meta-value">${item.price.toFixed(2)}</span>
-                  </div>
-                  <div className="meta-item">
-                    <span className="meta-label">Game ID:</span>
-                    <span className="meta-value">{item.gameId}</span>
                   </div>
                 </div>
 

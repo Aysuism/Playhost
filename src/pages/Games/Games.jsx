@@ -12,8 +12,8 @@ const GameServer = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [sortOption, setSortOption] = useState('default');
 
-  const handleCategorySelect = (categoryId) => {
-    setSelectedCategory(categoryId);
+  const handleCategorySelect = (id) => {
+    setSelectedCategory(id);
   };
 
   const resetCategory = () => {

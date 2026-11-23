@@ -1,0 +1,18 @@
+.light {
+    --bg-color: #ffffff;
+    --p-color: #92939E;
+    --Kcolor: #000;
+    --bg-img: url('/bg-pirate-ship.jpg');
+    --sign-in-out-bg: url('/login-bg-light.jpeg');
+}
+
+.dark {
+    --bg-color: #010314;
+    --p-color: #fff;
+    --Kcolor: #fff;
+    --bg-img: url('/spiderman.png');
+    --sign-in-out-bg: url('/login-bg-dark.png');
+    --ap-hero-accent: #9d6bff;
+    --ap-eyebrow-text: #c4a6ff;
+    --ap-hero-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+}

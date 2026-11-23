@@ -1,13 +1,12 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { useEditCategoryMutation } from '../../tools/api/games-category';
-import Swal from 'sweetalert2';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
 const EditCatForm = ({ category, onClose, refetch }) => {
-    const { lang } = useContext(LangContext);  // Accessing lang from context
+    const { lang } = useContext(LangContext);
     const [formData, setFormData] = useState({
         category: category.category,
-        categoryId: category.categoryId
     });
 
     const [editCategory, { isLoading }] = useEditCategoryMutation();
@@ -16,38 +15,26 @@ const EditCatForm = ({ category, onClose, refetch }) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: name === 'categoryId' ? Number(value) || '' : value
+            [name]: value
         }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         try {
-            // Send as a regular object instead of FormData
-            await editCategory({ 
-                id: category._id, 
+            await editCategory({
+                id: category._id,
                 category: formData.category,
-                categoryId: formData.categoryId
             }).unwrap();
-            
-            Swal.fire({
-                icon: 'success',
-                title: lang === 'AZ' ? 'Uğurlu!' : 'Success!',
-                text: lang === 'AZ' ? 'Kateqoriya uğurla yeniləndi!' : 'Category updated successfully!',
-                timer: 2000,
-                showConfirmButton: false
-            });
-            
+
+            notify.updated();
+
             onClose();
             refetch();
         } catch (error) {
             console.error('Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-                text: error.data?.message || (lang === 'AZ' ? 'Kateqoriya yenilənərkən xətaya yol verildi' : 'Failed to update category'),
-            });
+            notify.updateFailed(error.data?.message);
         }
     };
 
@@ -64,20 +51,6 @@ const EditCatForm = ({ category, onClose, refetch }) => {
                     onChange={handleChange}
                     required
                     maxLength={50}
-                />
-            </div>
-
-            <div className="mb-3">
-                <label htmlFor="categoryId" className="form-label">{lang === 'AZ' ? 'Kateqoriya ID' : 'Category ID'}</label>
-                <input
-                    type="number"
-                    className="form-control"
-                    id="categoryId"
-                    name="categoryId"
-                    value={formData.categoryId}
-                    onChange={handleChange}
-                    required
-                    min="1"
                 />
             </div>
 

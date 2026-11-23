@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useEditGameMutation } from '../../tools/api/games';
 import { useGetCategoryQuery } from '../../tools/api/games-category';
-import Swal from 'sweetalert2';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
 const baseFlagUrl = 'https://designesia.com/themes/playhost/images/flags';
 
@@ -28,7 +28,6 @@ const EditGamesForm = ({ game, onClose, refetch }) => {
   const { data: categories } = useGetCategoryQuery();
 
   const [formData, setFormData] = useState({
-    gameId: 1,
     gameName: '',
     gameCategory: '',
     originalPrice: 0,
@@ -36,7 +35,6 @@ const EditGamesForm = ({ game, onClose, refetch }) => {
     discount: 0,
     discountedPrice: 0,
     rating: 0,
-    reviews: 0,
     slot: 0,
     duration: 0,
     location: [{ country: '', flagUrl: '', isSelected: false }],
@@ -47,12 +45,10 @@ const EditGamesForm = ({ game, onClose, refetch }) => {
     if (game) {
       const matchedCategory = categories?.find(c =>
         c._id === game.gameCategory ||
-        c._id === game.gameCategory?._id ||
-        c.categoryId === game.gameCategory?.categoryId
+        c._id === game.gameCategory?._id
       );
 
       setFormData({
-        gameId: game.gameId || 1,
         gameName: game.gameName || '',
         gameCategory: matchedCategory?._id || game.gameCategory || '',
         originalPrice: game.originalPrice || 0,
@@ -60,7 +56,6 @@ const EditGamesForm = ({ game, onClose, refetch }) => {
         discount: game.discount || 0,
         discountedPrice: game.discountedPrice || 0,
         rating: game.rating || 0,
-        reviews: game.reviews || 0,
         slot: game.slot || 0,
         duration: game.duration || 0,
         location: game.location?.length > 0 ? [...game.location] : [{ country: '', flagUrl: '', isSelected: false }],
@@ -122,14 +117,14 @@ const EditGamesForm = ({ game, onClose, refetch }) => {
     e.preventDefault();
 
     if (!categories?.some(c => c._id === formData.gameCategory)) {
-      Swal.fire({ icon: 'error', title: lang === 'AZ' ? 'Yanlış Kateqoriya' : 'Invalid Category', text: lang === 'AZ' ? 'Zəhmət olmasa doğru kateqoriya seçin' : 'Please select a valid category' });
+      notify.error('Zəhmət olmasa doğru kateqoriya seçin', 'Please select a valid category');
       return;
     }
 
     const data = new FormData();
     const fields = [
-      'gameId', 'gameName', 'originalPrice', 'discountIndicator', 'discount',
-      'discountedPrice', 'rating', 'reviews', 'slot', 'duration', 'gameCategory'
+      'gameName', 'originalPrice', 'discountIndicator', 'discount',
+      'discountedPrice', 'rating', 'slot', 'duration', 'gameCategory'
     ];
 
     if (formData.imageUrl instanceof File) data.append('imageUrl', formData.imageUrl);
@@ -143,23 +138,17 @@ const EditGamesForm = ({ game, onClose, refetch }) => {
 
     try {
       await editGame({ id: game._id, formData: data }).unwrap();
-      Swal.fire({ icon: 'success', title: lang === 'AZ' ? 'Uğurlu!' : 'Success!', text: lang === 'AZ' ? 'Oyun yeniləndi!' : 'Game updated!', timer: 2000 });
+      notify.updated();
       refetch();
       onClose();
     } catch (error) {
-      Swal.fire({ icon: 'error', title: lang === 'AZ' ? 'Xəta!' : 'Error!', text: error.data?.message || (lang === 'AZ' ? 'Yeniləmə baş vermədi' : 'Update failed') });
+      notify.updateFailed(error.data?.message);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="form-container p-4 p-md-5 rounded shadow-sm">
       <div className="row g-4">
-        {/* Game ID */}
-        <div className="col-md-6">
-          <label className="form-label">{lang === 'AZ' ? 'Oyun ID' : 'Game ID'}</label>
-          <input type="text" name="gameId" className="form-control" value={formData.gameId || ''} onChange={handleChange} required />
-        </div>
-
         {/* Game Name */}
         <div className="col-md-6">
           <label className="form-label">{lang === 'AZ' ? 'Oyun Adı' : 'Game Name'}</label>
@@ -232,12 +221,6 @@ const EditGamesForm = ({ game, onClose, refetch }) => {
             <option value="4">{lang === 'AZ' ? '4 - Çox Yaxşı' : '4 - Good'}</option>
             <option value="5">{lang === 'AZ' ? '5 - Əla' : '5 - Excellent'}</option>
           </select>
-        </div>
-
-        {/* Reviews */}
-        <div className="col-md-6">
-          <label className="form-label">{lang === 'AZ' ? 'Rəylərin sayı' : 'Number of Reviews'}</label>
-          <input type="number" name="reviews" min="0" className="form-control" value={formData.reviews || 0} onChange={handleChange} />
         </div>
 
         {/* Slots */}
@@ -323,7 +306,7 @@ const EditGamesForm = ({ game, onClose, refetch }) => {
           {game.imageUrl?.[0] && !formData.imageUrl && (
             <div className="mb-3">
               <label className="form-label">{lang === 'AZ' ? 'Əvvəlki Şəkil' : 'Previous Image'}</label>
-              <img src={`https://playhost-backend-production.up.railway.app/${game.imageUrl[0]}`} alt="Previous Game Image" style={{ maxWidth: '100px', maxHeight: '100px' }} />
+              <img src={`http://localhost:3333/${game.imageUrl[0]}`} alt="Previous Game Image" style={{ maxWidth: '100px', maxHeight: '100px' }} />
             </div>
           )}
 

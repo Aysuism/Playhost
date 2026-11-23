@@ -1,17 +1,16 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from '../../../app';
 
 export const teamApi = createApi({
   reducerPath: 'teamApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://playhost-backend-production.up.railway.app/' }),
+  baseQuery,
   tagTypes: ['Team'],
   endpoints: (builder) => ({
-    // Get all team members
     getTeamMembers: builder.query({
       query: () => '/team',
       providesTags: ['Team'],
     }),
 
-    // Add new team member
     addTeamMember: builder.mutation({
       query: (formData) => ({
         url: '/ad/aboutuspage/team',
@@ -21,7 +20,6 @@ export const teamApi = createApi({
       invalidatesTags: ['Team'],
     }),
 
-    // Edit existing team member
     editTeamMember: builder.mutation({
       query: ({ id, formData }) => ({
         url: `/ad/aboutuspage/team/${id}`,
@@ -31,7 +29,6 @@ export const teamApi = createApi({
       invalidatesTags: (result, error, { id }) => [{ type: 'Team', id }],
     }),
 
-    // Delete team member
     deleteTeamMember: builder.mutation({
       query: (id) => ({
         url: `/ad/aboutuspage/team/${id}`,

@@ -1,29 +1,26 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from '../../../app';
 
 export const reviewsApi = createApi({
   reducerPath: 'reviewsApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://playhost-backend-production.up.railway.app/' }),
+  baseQuery,
   tagTypes: ['Review'],
   endpoints: (builder) => ({
-    // Get all reviews
     getReviews: builder.query({
       query: () => '/customerreviews',
       providesTags: ['Review'],
     }),
 
-    // Add new review
     addReview: builder.mutation({
       query: (formData) => ({
         url: '/ad/aboutuspage/customerreviews',
         method: 'POST',
         body: formData,
-        // Add this if your backend needs it:
 
       }),
       invalidatesTags: ['Review'],
     }),
 
-    // Edit existing review
     editReview: builder.mutation({
       query: ({ id, formData }) => ({
         url: `/ad/aboutuspage/customerreviews/${id}`,

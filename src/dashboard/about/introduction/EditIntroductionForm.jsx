@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useEditIntroductionMutation } from '../../tools/api/about-introduction';
-import Swal from 'sweetalert2';
 import { useContext } from 'react';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
 const EditIntroductionForm = ({ introduction, onClose, refetch }) => {
   const { lang } = useContext(LangContext)
@@ -39,7 +39,6 @@ const EditIntroductionForm = ({ introduction, onClose, refetch }) => {
     e.preventDefault();
     const data = new FormData();
 
-    // Append all text fields
     data.append('spanAze', formData.spanAze);
     data.append('spanEng', formData.spanEng);
     data.append('headingAze', formData.headingAze);
@@ -55,28 +54,17 @@ const EditIntroductionForm = ({ introduction, onClose, refetch }) => {
     data.append('subdescriptionSecondAze', formData.subdescriptionSecondAze);
     data.append('subdescriptionSecondEng', formData.subdescriptionSecondEng);
 
-    // Append image if exists
     if (formData.imageUrl) {
       data.append('imageUrl', formData.imageUrl);
     }
 
     try {
       await editIntroduction({ id: introduction._id, formData: data }).unwrap();
-      Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: 'Introduction updated successfully!',
-        timer: 2000,
-        showConfirmButton: true
-      });
+      notify.updated();
       refetch();
       onClose();
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error!',
-        text: error.data?.message || 'Failed to update introduction',
-      });
+      notify.updateFailed(error.data?.message);
     }
   };
 

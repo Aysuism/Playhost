@@ -17,7 +17,7 @@ const BlogCard = ({ alldata }) => {
 
       <Link className="news" to={`/blog/${engSlug}`}>
         <img
-          src={`https://playhost-backend-production.up.railway.app/${alldata.imageUrl}`}
+          src={`http://localhost:3333/${alldata.imageUrl}`}
           alt={lang === 'AZ' ? alldata.titleAze : alldata.titleEng}
         />
         <h4>{lang === 'AZ' ? alldata.titleAze : alldata.titleEng}</h4>

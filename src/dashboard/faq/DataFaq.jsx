@@ -1,8 +1,8 @@
 import React, { useState, useContext } from 'react';
-import Swal from 'sweetalert2';
 import EditFaqForm from './EditFaqForm';
 import { useDeleteFaqMutation } from '../tools/api/faq';
 import { LangContext } from '../../context/LangContext';
+import { notify } from '../../hooks/useNotify';
 
 const DataFaq = ({ faqs, refetch, isLoading, isError }) => {
     const { lang } = useContext(LangContext);
@@ -10,26 +10,7 @@ const DataFaq = ({ faqs, refetch, isLoading, isError }) => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [deleteFaq, { isLoading: isDeleting }] = useDeleteFaqMutation();
 
-    const handleDelete = async (id) => {
-        Swal.fire({
-            title: 'Delete FAQ?',
-            text: 'This action cannot be undone!',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Delete',
-            cancelButtonText: 'Cancel',
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    await deleteFaq(id).unwrap();
-                    Swal.fire('Deleted!', 'FAQ removed successfully.', 'success');
-                    refetch();
-                } catch (error) {
-                    Swal.fire('Error!', error.data?.message || 'Failed to delete FAQ.', 'error');
-                }
-            }
-        });
-    };
+    const handleDelete = (id) => notify.deleteItem(() => deleteFaq(id).unwrap(), refetch);
 
     if (isLoading) return <div className="text-center py-4">Loading FAQs...</div>;
     if (isError) return <div className="text-center py-4 text-danger">Error loading FAQs</div>;

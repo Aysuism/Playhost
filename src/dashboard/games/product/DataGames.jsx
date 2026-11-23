@@ -1,43 +1,15 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { useDeleteGameMutation, useGetGamesQuery } from '../../tools/api/games';
 import EditGamesForm from './EditGamesForm';
-import Swal from 'sweetalert2';
 import { LangContext } from '../../../context/LangContext';
 
 const DataGames = ({ games, refetch }) => {
-  const { lang } = useContext(LangContext); 
+  const { lang } = useContext(LangContext);
   const [editingGame, setEditingGame] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [deleteGame, { isLoading: isDeleting }] = useDeleteGameMutation();
 
-  const handleDelete = async (id) => {
-    Swal.fire({
-      title: lang === 'AZ' ? 'Oyunu silmək istəyirsiniz?' : 'Delete Game?',
-      text: lang === 'AZ' ? 'Bu əməliyyat geri alına bilməz!' : "This action cannot be undone!",
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: lang === 'AZ' ? 'Sil' : 'Delete',
-      cancelButtonText: lang === 'AZ' ? 'Ləğv et' : 'Cancel'
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await deleteGame(id).unwrap();
-          Swal.fire(
-            lang === 'AZ' ? 'Silindi!' : 'Deleted!',
-            lang === 'AZ' ? 'Oyun müvəffəqiyyətlə silindi.' : 'Game removed successfully.',
-            'success'
-          );
-          refetch();
-        } catch (error) {
-          Swal.fire(
-            lang === 'AZ' ? 'Xəta!' : 'Error!',
-            error.data?.message || (lang === 'AZ' ? 'Oyunu silmək mümkün olmadı.' : 'Failed to delete game.'),
-            'error'
-          );
-        }
-      }
-    });
-  };
+  const handleDelete = (id) => notify.deleteItem(() => deleteGame(id).unwrap(), refetch);
 
   const gamesWithDiscount = games.map((game) => {
     const discountPercentage = game.discountIndicator
@@ -92,7 +64,7 @@ const DataGames = ({ games, refetch }) => {
       <div className="dashboard-grid">
         {gamesWithDiscount.map((game) => {
           const imageUrl = game.imageUrl?.[0]
-            ? `https://playhost-backend-production.up.railway.app/${game.imageUrl[0].replace(/\\/g, '/')}`
+            ? `http://localhost:3333/${game.imageUrl[0].replace(/\\/g, '/')}`
             : null;
 
           return (
@@ -119,10 +91,6 @@ const DataGames = ({ games, refetch }) => {
 
                 <div className="dashboard-description">
                   <div className="description-item d-flex">
-                    <span className="description-label pe-2">{lang === 'AZ' ? 'Oyun ID: ' : 'Game ID: '}</span>
-                    <p style={{ fontWeight: '900' }}>{game.gameId || 'N/A'}</p>
-                  </div>
-                  <div className="description-item d-flex">
                     <span className="description-label pe-2">{lang === 'AZ' ? 'Kateqoriya:' : 'Category:'}</span>
                     <p style={{ fontWeight: '900' }}>{game.gameCategory?.category || 'N/A'}</p>
                   </div>
@@ -144,10 +112,6 @@ const DataGames = ({ games, refetch }) => {
                   <div className="meta-item">
                     <span className="meta-label">{lang === 'AZ' ? 'Reytinq:' : 'Rating:'}</span>
                     <span className="meta-value">{game.rating} / 5</span>
-                  </div>
-                  <div className="meta-item">
-                    <span className="meta-label">{lang === 'AZ' ? 'Rəy Sayı:' : 'Reviews:'}</span>
-                    <span className="meta-value">{game.reviews} reviews</span>
                   </div>
                   <div className="meta-item">
                     <span className="meta-label">{lang === 'AZ' ? 'Slot:' : 'Slot:'}</span>

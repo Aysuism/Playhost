@@ -1,6 +1,6 @@
 footer {
     background-color: #0F101E;
-    padding: 5%;
+    padding: 5% 5% 0 5%;
 
     p {
         color: #92939e;
@@ -48,6 +48,7 @@ footer {
 
             .email-btn {
                 @include purple-btn;
+                @include d-flex;
                 width: 20%;
                 border-radius: 0 30px 30px 0;
 
@@ -86,5 +87,10 @@ footer {
         display: flex;
         justify-content: space-between;
         border-top: 1px solid #92939e;
+
+        p {
+            margin: 0;
+            font-family: $font-Manrope !important;
+        }
     }
 }

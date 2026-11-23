@@ -1,10 +1,9 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from '../../../app';
 
 export const homeSliderApi = createApi({
   reducerPath: 'homeSliderApi',
-  baseQuery: fetchBaseQuery({ 
-    baseUrl: 'https://playhost-backend-production.up.railway.app/',
-  }),
+  baseQuery,
   endpoints: (builder) => ({
     getSliders: builder.query({
       query: () => '/slider',

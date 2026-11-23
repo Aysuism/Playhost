@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useEditCounterMutation } from '../../tools/api/about-counter';
-import Swal from 'sweetalert2';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
 const EditCounterForm = ({ counter, onClose, refetch }) => {
   const { lang } = useContext(LangContext);
@@ -23,8 +23,8 @@ const EditCounterForm = ({ counter, onClose, refetch }) => {
     e.preventDefault();
 
     try {
-      await editCounter({ 
-        id: counter._id, 
+      await editCounter({
+        id: counter._id,
         formData: {
           headingAze: formData.headingAze,
           headingEng: formData.headingEng,
@@ -33,22 +33,12 @@ const EditCounterForm = ({ counter, onClose, refetch }) => {
         isJson: true
       }).unwrap();
 
-      Swal.fire({
-        icon: 'success',
-        title: lang === 'AZ' ? 'Uğurlu!' : 'Success!',
-        text: lang === 'AZ' ? 'Sayğac uğurla yeniləndi!' : 'Counter updated successfully!',
-        timer: 2000,
-        showConfirmButton: true
-      });
+      notify.updated();
       refetch();
       onClose();
     } catch (error) {
       console.error('Update error:', error);
-      Swal.fire({
-        icon: 'error',
-        title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-        text: error?.data?.message || (lang === 'AZ' ? 'Sayğacı yeniləmək mümkün olmadı' : 'Failed to update counter'),
-      });
+      notify.updateFailed(error?.data?.message);
     }
   };
 
@@ -59,15 +49,15 @@ const EditCounterForm = ({ counter, onClose, refetch }) => {
           <label className="form-label">
             {lang === 'AZ' ? 'Başlıq (AZ)' : 'Heading (AZ)'}
           </label>
-          <input name="headingAze" value={formData.headingAze} onChange={handleChange} 
-                 className="form-control" required />
+          <input name="headingAze" value={formData.headingAze} onChange={handleChange}
+            className="form-control" required />
         </div>
         <div className="col-md-6 mb-3">
           <label className="form-label">
             {lang === 'AZ' ? 'Başlıq (EN)' : 'Heading (EN)'}
           </label>
-          <input name="headingEng" value={formData.headingEng} onChange={handleChange} 
-                 className="form-control" required />
+          <input name="headingEng" value={formData.headingEng} onChange={handleChange}
+            className="form-control" required />
         </div>
       </div>
 
@@ -75,8 +65,8 @@ const EditCounterForm = ({ counter, onClose, refetch }) => {
         <label className="form-label">
           {lang === 'AZ' ? 'Dəyər' : 'Value'}
         </label>
-        <input name="value" type="number" value={formData.value} onChange={handleChange} 
-               className="form-control" required />
+        <input name="value" type="number" value={formData.value} onChange={handleChange}
+          className="form-control" required />
       </div>
 
       <div className="d-flex justify-content-between">

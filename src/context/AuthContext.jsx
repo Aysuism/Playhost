@@ -6,7 +6,7 @@
 
 // export const AuthProvider = ({ children }) => {
 //     const [cookies, setCookie] = useCookies(['auth-token']);
-//     const baseUrl = "https://playhost-backend-production.up.railway.app/";
+//     const baseUrl = "http://localhost:3333/";
 //     const header = {
 //         headers: {
 //             "x-auth-token": cookies["auth-token"]

@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import Swal from 'sweetalert2';
+import { useState, useContext } from 'react';
 import { useEditPaymentMutation } from '../../tools/api/payment';
 import { LangContext } from '../../../context/LangContext';
-import { useContext } from 'react';
+import { notify } from '../../../hooks/useNotify';
 
 const EditPaymentForm = ({ payment, onClose, refetch }) => {
     const { lang } = useContext(LangContext);
@@ -30,31 +29,17 @@ const EditPaymentForm = ({ payment, onClose, refetch }) => {
         e.preventDefault();
 
         try {
-            await editPayment({ 
+            await editPayment({
                 id: payment._id,
                 ...formData
             }).unwrap();
-            
-            Swal.fire({
-                icon: 'success',
-                title: lang === 'AZ' ? 'Uğurlu!' : 'Success!',
-                text: lang === 'AZ' 
-                    ? 'Ödəniş metodu uğurla yeniləndi!' 
-                    : 'Payment method updated successfully!',
-                timer: 2000,
-                showConfirmButton: false
-            });
+
+            notify.updated();
             refetch();
             onClose();
         } catch (error) {
             console.error('Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-                text: error.data?.message || (lang === 'AZ' 
-                    ? 'Ödəniş metodunun yenilənməsi zamanı xəta baş verdi' 
-                    : 'Failed to update payment method'),
-            });
+            notify.updateFailed(error.data?.message);
         }
     };
 
@@ -119,7 +104,7 @@ const EditPaymentForm = ({ payment, onClose, refetch }) => {
             </div>
 
             <h6 className="mt-4">{lang === 'AZ' ? 'Ödəniş Üsulları:' : 'Payment Methods:'}</h6>
-            
+
             <div className="row">
                 <div className="col-md-6 mb-3">
                     <label htmlFor="visaBtnUrl" className="form-label">Visa URL</label>
@@ -200,8 +185,8 @@ const EditPaymentForm = ({ payment, onClose, refetch }) => {
                     {lang === 'AZ' ? 'Ləğv et' : 'Cancel'}
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={isLoading}>
-                    {isLoading 
-                        ? (lang === 'AZ' ? 'Yenilənir...' : 'Updating...') 
+                    {isLoading
+                        ? (lang === 'AZ' ? 'Yenilənir...' : 'Updating...')
                         : (lang === 'AZ' ? 'Yenilə' : 'Update')}
                 </button>
             </div>

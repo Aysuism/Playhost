@@ -1,10 +1,10 @@
 import React, { useContext, useState } from 'react';
-import Swal from 'sweetalert2';
 import { useAddFaqMutation } from '../tools/api/faq';
 import { LangContext } from '../../context/LangContext';
+import { notify } from '../../hooks/useNotify';
 
 const AddFaqForm = ({ refetch, onClose }) => {
-    const { lang } = useContext(LangContext);  
+    const { lang } = useContext(LangContext);
     const [formData, setFormData] = useState({
         questionId: 1,
         titleAze: '',
@@ -32,12 +32,7 @@ const AddFaqForm = ({ refetch, onClose }) => {
                 descriptionEng: formData.descriptionEng
             }).unwrap();
 
-            Swal.fire({
-                icon: 'success',
-                title: lang === 'AZ' ? 'Uğurlu!' : 'Success!',
-                text: lang === 'AZ' ? 'FAQ uğurla əlavə edildi.' : 'FAQ successfully added.',
-                confirmButtonText: 'OK',
-            });
+            notify.added();
 
             setFormData(prev => ({
                 questionId: prev.questionId + 1,
@@ -50,11 +45,7 @@ const AddFaqForm = ({ refetch, onClose }) => {
             onClose();
         } catch (err) {
             console.error('Error adding faq:', err);
-            Swal.fire({
-                icon: 'error',
-                title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-                text: err.data?.message || (lang === 'AZ' ? 'FAQ əlavə edilmədi' : 'Failed to add FAQ'),
-            });
+            notify.addFailed(err.data?.message);
         }
     };
 

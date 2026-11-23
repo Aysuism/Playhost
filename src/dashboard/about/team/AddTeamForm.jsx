@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import Swal from 'sweetalert2';
 import { useAddTeamMemberMutation } from '../../tools/api/about-team';
 import { useContext } from 'react';
 import { LangContext } from '../../../context/LangContext';
+import { notify } from '../../../hooks/useNotify';
 
 const AddTeamForm = ({ refetch, onClose }) => {
   const { lang } = useContext(LangContext)
@@ -28,12 +28,7 @@ const AddTeamForm = ({ refetch, onClose }) => {
     e.preventDefault();
 
     if (!formData.teamImage) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error!',
-        text: 'Please select a profile image.',
-        confirmButtonText: 'OK',
-      });
+      notify.error('Zəhmət olmasa profil şəkli seçin.', 'Please select a profile image.');
       return;
     }
 
@@ -45,12 +40,7 @@ const AddTeamForm = ({ refetch, onClose }) => {
 
     try {
       await addTeamMember(data).unwrap();
-      Swal.fire({
-        icon: 'success',
-        title: lang === 'AZ' ? 'Uğur!' : 'Success!',
-        text: lang === 'AZ' ? 'Komanda üzvü uğurla əlavə edildi.' : 'Team member successfully added.',
-        confirmButtonText: lang === 'AZ' ? 'Tamam' : 'OK',
-      });
+      notify.added();
       setFormData({
         fullname: '',
         roleAze: '',
@@ -60,12 +50,7 @@ const AddTeamForm = ({ refetch, onClose }) => {
       refetch();
       onClose();
     } catch (err) {
-      Swal.fire({
-        icon: 'error',
-        title: lang === 'AZ' ? 'Xəta!' : 'Error!',
-        text: lang === 'AZ' ? 'Zəhmət olmasa profil şəkli seçin.' : 'Please select a profile image.',
-        confirmButtonText: lang === 'AZ' ? 'Tamam' : 'OK',
-      });
+      notify.addFailed(err.data?.message);
     }
   };
 

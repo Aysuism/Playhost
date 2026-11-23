@@ -1,23 +1,25 @@
-import React, { useState } from 'react';
-import { useCart } from 'react-use-cart';
+import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { LangContext } from '../../context/LangContext';
-import { useContext } from 'react';
-import Cards from 'react-credit-cards';
 import 'react-credit-cards/es/styles-compiled.css';
 import { FaCreditCard, FaShoppingBag, FaTrash, FaArrowLeft, FaTag, FaTimes } from 'react-icons/fa';
-import Swal from 'sweetalert2';
-import slugify from 'slugify';
 import { useGetGamesQuery } from '../../dashboard/tools/api/games';
+import { useServerCart } from '../../hooks/useServerCart';
+import { LangContext } from '../../context/LangContext';
+import { notify } from '../../hooks/useNotify';
+import Cards from 'react-credit-cards';
+import { BASE_URL } from '../../app';
+import slugify from 'slugify';
 
 const Checkout = () => {
-  const { items, cartTotal, emptyCart } = useCart();
+  const { items, cartTotal, emptyCart } = useServerCart();
   const { lang } = useContext(LangContext);
   const { data: games = [] } = useGetGamesQuery();
-  
+
   const [discountCode, setDiscountCode] = useState('');
   const [discountApplied, setDiscountApplied] = useState(false);
   const [discountAmount, setDiscountAmount] = useState(0);
+  const [orderDone, setOrderDone] = useState(false);
+  const [recommendations, setRecommendations] = useState([]);
   const navigate = useNavigate();
 
   const [cardData, setCardData] = useState({
@@ -58,7 +60,6 @@ const Checkout = () => {
   };
 
   const applyDiscount = () => {
-    // Example discount codes - replace with your actual validation logic
     const validCodes = {
       'WELCOME10': 10,
       'SUMMER20': 20,
@@ -66,29 +67,15 @@ const Checkout = () => {
     };
 
     const code = discountCode.toUpperCase();
-    
+
     if (validCodes[code]) {
       const discount = validCodes[code];
       setDiscountAmount(discount);
       setDiscountApplied(true);
-      Swal.fire({
-        title: lang === "AZ" ? "Endirim tətbiq edildi!" : "Discount Applied!",
-        text: lang === "AZ" 
-          ? `${discount}% endirim əlavə edildi` 
-          : `${discount}% discount has been applied`,
-        icon: 'success',
-        confirmButtonColor: '#6c5ce7',
-      });
+      notify.success(`${discount}% endirim tətbiq edildi!`, `${discount}% discount applied!`);
     } else {
       setDiscountApplied(false);
-      Swal.fire({
-        title: lang === "AZ" ? "Yanlış endirim kodu" : "Invalid Discount Code",
-        text: lang === "AZ" 
-          ? "Daxil etdiyiniz endirim kodu yanlışdır" 
-          : "The discount code you entered is invalid",
-        icon: 'error',
-        confirmButtonColor: '#6c5ce7',
-      });
+      notify.error('Daxil etdiyiniz endirim kodu yanlışdır', 'The discount code you entered is invalid');
     }
   };
 
@@ -107,79 +94,70 @@ const Checkout = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const finalTotal = calculateTotal();
-  
-    const recommendations = games
-      .filter(game => game.rating >= 4)
-      .slice(0, 3);
-  
-    const recommendationsHTML = recommendations.map(item => `
-      <div 
-        onclick="window.location.href='/games/${slugify(item.gameName, { lower: true })}'"
-        style="
-          margin: 10px 0; 
-          padding: 10px; 
-          border: 1px solid #eee; 
-          border-radius: 5px;
-          cursor: pointer;
-          transition: all 0.2s;
-        "
-        onmouseover="this.style.backgroundColor='#f8f9fa'"
-        onmouseout="this.style.backgroundColor='white'"
-      >
-        <h4 style="margin: 0 0 5px 0;">${item.gameName}</h4>
-        <div style="display: flex; align-items: center;">
-          <img 
-            src="https://playhost-backend-production.up.railway.app/${item.imageUrl[0]}" 
-            style="
-              width: 50px; 
-              height: 50px; 
-              object-fit: cover; 
-              margin-right: 10px; 
-              border-radius: 4px;
-            "
-          >
-          <div>
-            <div style="color: gold;">
-              ${'★'.repeat(Math.round(item.rating))}${'☆'.repeat(5 - Math.round(item.rating))}
+
+    const picks = games.filter(game => game.rating >= 4).slice(0, 3);
+    setRecommendations(picks);
+
+    emptyCart();
+    setOrderDone(true);
+  };
+
+  // ---------- success screen ----------
+  if (orderDone) {
+    return (
+      <div className="checkout">
+        <div className="container py-5 text-center">
+          <h1>{lang === "AZ" ? "Ödəniş uğurla tamamlandı!" : "Payment Successful!"}</h1>
+          <p>
+            {lang === "AZ"
+              ? "Sifarişiniz qəbul edildi. Təşəkkür edirik!"
+              : "Your order has been received. Thank you!"}
+          </p>
+
+          {discountApplied && (
+            <p style={{ color: '#6c5ce7', fontWeight: 'bold' }}>
+              {lang === "AZ" ? `${discountAmount}% endirim tətbiq edildi` : `${discountAmount}% discount applied`}
+            </p>
+          )}
+
+          {recommendations.length > 0 && (
+            <div className="mx-auto text-start" style={{ maxWidth: 500 }}>
+              <h4 className="mt-4 mb-3 text-center">
+                {lang === "AZ" ? "Tövsiyə edirik:" : "We recommend:"}
+              </h4>
+
+              {recommendations.map(item => (
+                <Link
+                  key={item._id}
+                  to={`/games/${slugify(item.gameName, { lower: true })}`}
+                  className="d-flex align-items-center p-2 mb-2 border rounded text-decoration-none"
+                >
+                  <img
+                    src={BASE_URL + item.imageUrl[0]}
+                    alt={item.gameName}
+                    style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4, marginRight: 10 }}
+                  />
+                  <div>
+                    <h6 className="mb-1">{item.gameName}</h6>
+                    <div style={{ color: 'gold' }}>
+                      {'★'.repeat(Math.round(item.rating))}{'☆'.repeat(5 - Math.round(item.rating))}
+                    </div>
+                    <div style={{ fontWeight: 'bold', color: '#6c5ce7' }}>
+                      ${item.discountIndicator ? item.discountedPrice : item.originalPrice}
+                    </div>
+                  </div>
+                </Link>
+              ))}
             </div>
-            <div style="font-weight: bold; color: #6c5ce7;">
-              $${item.discountIndicator ? item.discountedPrice : item.originalPrice}
-            </div>
-          </div>
+          )}
+
+          <button className="btn btn-primary mt-4" onClick={() => navigate('/games')}>
+            {lang === "AZ" ? "Tamam" : "OK"}
+          </button>
         </div>
       </div>
-    `).join('');
-  
-    Swal.fire({
-      title: lang === "AZ" ? "Ödəniş uğurla tamamlandı!" : "Payment Successful!",
-      html: `
-        <div>
-          <p>${lang === "AZ" 
-            ? "Sifarişiniz qəbul edildi. Təşəkkür edirik!" 
-            : "Your order has been received. Thank you!"}</p>
-          ${discountApplied ? `
-            <p style="color: #6c5ce7; font-weight: bold;">
-              ${lang === "AZ" ? `${discountAmount}% endirim tətbiq edildi` : `${discountAmount}% discount applied`}
-            </p>
-          ` : ''}
-          ${recommendations.length > 0 ? `
-            <h4 style="margin-top: 20px; margin-bottom: 10px;">
-              ${lang === "AZ" ? "Tövsiyə edirik:" : "We recommend:"}
-            </h4>
-            ${recommendationsHTML}
-          ` : ''}
-        </div>
-      `,
-      icon: 'success',
-      confirmButtonText: lang === "AZ" ? 'Tamam' : 'OK',
-      confirmButtonColor: '#6c5ce7',
-      willClose: () => {
-        emptyCart();
-        navigate('/games');
-      }
-    });
-  };
+    );
+  }
 
   return (
     <div className="checkout">
@@ -302,7 +280,7 @@ const Checkout = () => {
                   {items.map((item, index) => (
                     <div key={index} className="order-item">
                       <img
-                        src={`https://playhost-backend-production.up.railway.app/${item.imageUrl}`}
+                        src={BASE_URL + item.imageUrl?.[0]}
                         alt={item.gameName}
                         className="img-fluid"
                       />
@@ -330,8 +308,8 @@ const Checkout = () => {
                           value={discountCode}
                           onChange={(e) => setDiscountCode(e.target.value)}
                         />
-                        <button 
-                          className="btn btn-outline-secondary" 
+                        <button
+                          className="btn btn-outline-secondary"
                           type="button"
                           onClick={applyDiscount}
                         >
@@ -344,7 +322,7 @@ const Checkout = () => {
                       <span>
                         <FaTag /> {discountCode.toUpperCase()} - {discountAmount}% {lang === "AZ" ? "endirim" : "off"}
                       </span>
-                      <button 
+                      <button
                         className="btn btn-sm btn-link text-danger"
                         onClick={removeDiscount}
                       >
